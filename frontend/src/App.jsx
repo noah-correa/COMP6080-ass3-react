@@ -1,47 +1,37 @@
 import React, { useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import Router from './utils/Router';
 import { Context, initialValue } from './utils/Context';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import SiteWrapper from './pages/SiteWrapper';
 
-import Router from './utils/Router';
-import Sidebar from './components/Sidebar';
-import Footer from './components/Footer';
-
-import { BodyWrapper, ContentWrapper } from './styles';
-
-function App () {
-  const [content, setContent] = useState(initialValue.content);
-  const [loaded, setLoaded] = useState(initialValue.loaded);
+const App = () => {
   const [loggedIn, setLoggedIn] = useState(initialValue.loggedIn);
   const [title, setTitle] = useState(initialValue.title);
   const [token, setToken] = useState(initialValue.token);
+  const [sidebarOpen, setSidebarOpen] = useState(initialValue.sidebarOpen);
 
   const getters = {
-    content,
-    loaded,
     loggedIn,
     title,
-    token
+    token,
+    sidebarOpen,
   };
 
   const setters = {
-    setContent,
-    setLoaded,
     setLoggedIn,
     setTitle,
     setToken,
+    setSidebarOpen,
   }
 
   return (
     <Context.Provider value={{ getters, setters }}>
       <BrowserRouter>
-        { loggedIn && <Sidebar/>}
-        <BodyWrapper>
-          <ContentWrapper>
-            <Router/>
-          </ContentWrapper>
-          <Footer/>
-        </BodyWrapper>
+        <SiteWrapper>
+          <Router/>
+        </SiteWrapper>
       </BrowserRouter>
     </Context.Provider>
   );

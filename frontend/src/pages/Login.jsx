@@ -1,62 +1,80 @@
 import React, { useRef, useState } from 'react';
 import useAppContext from '../utils/Context';
-import { Form, Button, Alert, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Form, Button, Card, Alert } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import API from '../utils/API';
 
+// Components
 import Loading from '../components/Loading';
 
-import { Main, AuthCard, CardHeading, CardSubHeading } from '../styles';
+// Styled Components
+import { Main, AuthCard, CardSubHeading } from '../styles';
 
-const Login = (props) => {
+const Login = () => {
   const { setters } = useAppContext();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [validated, setValidated] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState('');
 
   // Form States
   const emailRef = useRef('');
   const passwordRef = useRef('');
 
-  if (loading) return <Loading/>;
-
+  // Login Submit Button Handler
   const handleLogin = async (event) => {
     event.preventDefault();
-    setLoading(true);
-    setError('');
-    const data = await API.login(emailRef.current.value, passwordRef.current.value);
-    if (data.error) {
-      setError(data.error);
+    event.stopPropagation();
+    const form = event.currentTarget;
+    if (!form.checkValidity()) {
+      if (!form.email.value) setErrors(prev => { return { ...prev, email: true } });
+      if (!form.password.value) setErrors(prev => { return { ...prev, password: true } });
     } else {
-      setters.setToken(data.token);
+      setLoading(true);
+      const data = await API.login(emailRef.current.value, passwordRef.current.value);
+      setLoading(false);
+      if (data.error) {
+        console.error('Could not login user');
+        setLoginError('Invalid email or password');
+        setValidated(false);
+      } else {
+        setValidated(true);
+        setErrors({});
+        setters.setToken(data.token);
+        setters.setLoggedIn(true);
+        navigate('/dashboard');
+      }
     }
-    setLoading(false);
   };
+
+  if (loading) return <Loading/>;
 
   return (
     <Main>
       <AuthCard>
         <Card.Body>
-          <CardHeading>BigBrain</CardHeading>
-          <br/>
           <CardSubHeading>Login</CardSubHeading>
-          <Form>
+          { loginError && <Alert variant='danger' dismissible onClose={() => setLoginError('')}>{loginError}</Alert>}
+          <Form noValidate validated={validated} onSubmit={handleLogin}>
             <Form.Group>
               <Form.Label>Email</Form.Label>
-              <Form.Control type='email' placeholder='Enter email' autoComplete='on' ref={emailRef}></Form.Control>
+              <Form.Control required isInvalid={!!errors.email} type='email' placeholder='Enter email' autoComplete='on' ref={emailRef} name="email"></Form.Control>
+              <Form.Control.Feedback type='invalid'>Invalid email</Form.Control.Feedback>
             </Form.Group>
             <br/>
             <Form.Group>
               <Form.Label>Password</Form.Label>
-              <Form.Control type='password' placeholder='Enter password' autoComplete='on' ref={passwordRef}></Form.Control>
+              <Form.Control required isInvalid={!!errors.password} type='password' placeholder='Enter password' autoComplete='on' ref={passwordRef} name="password"></Form.Control>
+              <Form.Control.Feedback type='invalid'>Invalid password</Form.Control.Feedback>
             </Form.Group>
             <br/>
-            <Button variant='primary' type='button' onClick={handleLogin}>Login</Button>
+            <Button variant='primary' type='submit'>Login</Button>
           </Form>
           <br/>
           <Link to="/register">Don&apos;t have an account? Register</Link>
         </Card.Body>
       </AuthCard>
-      { error && <Alert>{error}</Alert> }
     </Main>
   );
 }
