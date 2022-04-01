@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FooterCard } from '../styles';
+import { FooterCard } from '../styles/common';
 
 const Footer = () => {
   return (

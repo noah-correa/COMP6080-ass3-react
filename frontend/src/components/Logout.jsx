@@ -26,6 +26,7 @@ const Logout = () => {
     } else {
       setters.setToken('');
       setters.setLoggedIn(false);
+      localStorage.clear('bb_token');
       navigate('/login');
     }
   }

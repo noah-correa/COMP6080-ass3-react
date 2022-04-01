@@ -8,7 +8,7 @@ import API from '../utils/API';
 import Loading from '../components/Loading';
 
 // Styled Components
-import { Main, AuthCard, CardSubHeading } from '../styles';
+import { Main, AuthCard, CardSubHeading } from '../styles/common';
 
 const Login = () => {
   const { setters } = useAppContext();
@@ -41,6 +41,7 @@ const Login = () => {
       } else {
         setValidated(true);
         setErrors({});
+        localStorage.setItem('bb_token', data.token);
         setters.setToken(data.token);
         setters.setLoggedIn(true);
         navigate('/dashboard');

@@ -8,7 +8,7 @@ const HeaderWrapper = styled.header`
   background-color: #25076b;
   z-index: 5;
   /* border-radius: 2px; */
-  box-shadow: 0px 1px 10px black;
+  /* box-shadow: 0px 1px 10px black; */
   width: 100%;
   display: flex;
   align-items: center;
@@ -42,12 +42,11 @@ const Header = () => {
 
   const handleSidebarToggle = async (event) => {
     event.preventDefault();
-    console.log(!getters.sidebarOpen);
     setters.setSidebarOpen(!getters.sidebarOpen);
   }
 
   return (
-    <HeaderWrapper>
+    <HeaderWrapper className='shadow'>
       <IconButton
         style={getters.loggedIn ? visible : hidden }
         onClick={handleSidebarToggle}>

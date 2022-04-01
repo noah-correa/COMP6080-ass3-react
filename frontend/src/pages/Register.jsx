@@ -8,7 +8,7 @@ import API from '../utils/API';
 import Loading from '../components/Loading';
 
 // Styled Components
-import { Main, AuthCard, CardSubHeading } from '../styles';
+import { Main, AuthCard, CardSubHeading } from '../styles/common';
 
 const Register = () => {
   const { setters } = useAppContext();

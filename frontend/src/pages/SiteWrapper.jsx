@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { BodyWrapper, ContentWrapper } from '../styles';
+import { BodyWrapper, ContentWrapper } from '../styles/common';
 
 const SiteWrapper = ({ children }) => {
   return (
