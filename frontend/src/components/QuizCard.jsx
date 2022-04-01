@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Button, Card, Image } from 'react-bootstrap';
 import API from '../utils/API';
-import useAppContext from '../utils/Context';
+import { useAuth } from '../utils/Auth';
+import { useNavigate } from 'react-router-dom';
 
 const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
-  const { getters } = useAppContext();
+  const { token } = useAuth();
+  const navigate = useNavigate();
   const [error, setError] = useState('');
   const [questions, setQuestions] = useState([]);
   const [duration, setDuration] = useState(0);
@@ -14,8 +16,8 @@ const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
   if (empty) {
     return (
       <Card className='shadow-sm mb-2'>
-        <Card.Body>
-          <p className='text-center'><i>No quizzes to display</i></p>
+        <Card.Body className='text-center'>
+          <i>No quizzes to display</i>
         </Card.Body>
       </Card>
     );
@@ -24,7 +26,7 @@ const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
   // Fetch questions from backend
   useEffect(async () => {
     if (quiz.id) {
-      const data = await API.getQuiz(getters.token, quiz.id);
+      const data = await API.getQuiz(token, quiz.id);
       if (data.error) {
         console.error(data.error);
         setError('Could not fetch quiz');
@@ -47,18 +49,19 @@ const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
   }, [questions]);
 
   // View Button Handler
-  const handleView = async (event) => {
+  const handleEdit = async (event) => {
     event.preventDefault();
+    navigate(`/quiz/edit/${quiz.id}`);
   }
 
   // Delete Button Handler
   const handleDelete = async (event) => {
     event.preventDefault();
-    const data = await API.deleteQuiz(getters.token, quiz.id);
+    const data = await API.deleteQuiz(token, quiz.id);
     if (data.error) {
       setError('Could not delete quiz');
     } else {
-      fetchQuizzes(getters.token);
+      fetchQuizzes(token);
     }
   }
 
@@ -73,7 +76,7 @@ const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
         <p>Owner: {quiz.owner}</p>
         <p>Duration: {duration} seconds</p>
         <p>{ questions.length } question{ questions.length === 1 ? '' : 's' }</p>
-        <Button variant='primary' onClick={handleView}>View</Button>
+        <Button variant='primary' onClick={handleEdit}>Edit</Button>
         <Button variant='danger' onClick={handleDelete}>Delete</Button>
       </Card.Body>
     </Card>

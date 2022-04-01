@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import useAppContext from '../utils/Context';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../utils/Auth';
 import API from '../utils/API';
 import QuizCard from '../components/QuizCard';
 import { Container, Button, Card, Collapse, InputGroup, FormControl, Alert } from 'react-bootstrap';
 
 const Dashboard = () => {
-  const { getters, setters } = useAppContext();
-  const navigate = useNavigate();
+  const { token, setTitle } = useAuth();
   const createQuizNameRef = useRef('');
   const [showCreateQuiz, setShowCreateQuiz] = useState(false);
   const [error, setError] = useState('');
@@ -15,16 +13,10 @@ const Dashboard = () => {
   const [success, setSuccess] = useState(false);
   const [quizzes, setQuizzes] = useState([]);
 
-  // Check if authorised user
+  // Change document title
   useEffect(() => {
-    const localToken = localStorage.getItem('bb_token');
-    if (localToken) {
-      setters.setToken(localToken);
-      setters.setLoggedIn(true);
-    } else if (!getters.loggedIn) {
-      navigate('/login');
-    }
-  }, [getters.loggedIn]);
+    setTitle('Dashboard');
+  }, []);
 
   // Fetch all quizzes function
   const fetchAllQuizzes = async (token) => {
@@ -40,8 +32,8 @@ const Dashboard = () => {
 
   // Fetch all quizzes from backend
   useEffect(async () => {
-    if (getters.token) await fetchAllQuizzes(getters.token);
-  }, [getters.token]);
+    if (token) await fetchAllQuizzes(token);
+  }, [token]);
 
   // Create Quiz Button Handler
   const handleCreateQuiz = async (event) => {
@@ -49,7 +41,7 @@ const Dashboard = () => {
     if (!createQuizNameRef.current.value) {
       setQuizzesError('Invalid quiz name');
     } else {
-      const data = await API.createQuiz(getters.token, createQuizNameRef.current.value);
+      const data = await API.createQuiz(token, createQuizNameRef.current.value);
       if (data.error) {
         console.error('Could not create quiz');
         setQuizzesError('Could not create quiz, please try again later');
@@ -57,7 +49,7 @@ const Dashboard = () => {
         setQuizzesError('');
         setSuccess(true);
         createQuizNameRef.current.value = '';
-        fetchAllQuizzes(getters.token);
+        fetchAllQuizzes(token);
       }
     }
   }

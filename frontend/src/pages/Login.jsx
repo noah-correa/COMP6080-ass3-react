@@ -1,8 +1,7 @@
-import React, { useRef, useState } from 'react';
-import useAppContext from '../utils/Context';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../utils/Auth';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import API from '../utils/API';
 
 // Components
 import Loading from '../components/Loading';
@@ -11,7 +10,7 @@ import Loading from '../components/Loading';
 import { Main, AuthCard, CardSubHeading } from '../styles/common';
 
 const Login = () => {
-  const { setters } = useAppContext();
+  const { login, token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
@@ -21,6 +20,11 @@ const Login = () => {
   // Form States
   const emailRef = useRef('');
   const passwordRef = useRef('');
+
+  // Check if logged in already
+  useEffect(() => {
+    if (token) navigate('/dashboard');
+  }, []);
 
   // Login Submit Button Handler
   const handleLogin = async (event) => {
@@ -32,7 +36,7 @@ const Login = () => {
       if (!form.password.value) setErrors(prev => { return { ...prev, password: true } });
     } else {
       setLoading(true);
-      const data = await API.login(emailRef.current.value, passwordRef.current.value);
+      const data = await login(emailRef.current.value, passwordRef.current.value);
       setLoading(false);
       if (data.error) {
         console.error('Could not login user');
@@ -41,9 +45,6 @@ const Login = () => {
       } else {
         setValidated(true);
         setErrors({});
-        localStorage.setItem('bb_token', data.token);
-        setters.setToken(data.token);
-        setters.setLoggedIn(true);
         navigate('/dashboard');
       }
     }

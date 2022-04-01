@@ -1,8 +1,9 @@
 import React from 'react';
-import useAppContext from '../utils/Context';
 import styled from 'styled-components';
+import { useAuth } from '../utils/Auth';
 
 import Logout from './Logout';
+import { useNavigate } from 'react-router-dom';
 
 const HeaderWrapper = styled.header`
   background-color: #25076b;
@@ -16,6 +17,10 @@ const HeaderWrapper = styled.header`
   position: sticky;
   top: 0;
   color: white;
+`;
+
+const HeaderButton = styled.h2`
+  cursor: pointer;
 `;
 
 const IconButton = styled.button`
@@ -38,22 +43,28 @@ const visible = {
 };
 
 const Header = () => {
-  const { getters, setters } = useAppContext();
+  const { token, sidebarOpen, setSidebarOpen } = useAuth();
+  const navigate = useNavigate();
 
   const handleSidebarToggle = async (event) => {
     event.preventDefault();
-    setters.setSidebarOpen(!getters.sidebarOpen);
+    setSidebarOpen(!sidebarOpen);
+  }
+
+  const handleDashboard = (event) => {
+    event.preventDefault();
+    navigate('/dashboard');
   }
 
   return (
     <HeaderWrapper className='shadow'>
       <IconButton
-        style={getters.loggedIn ? visible : hidden }
+        style={ token ? visible : hidden }
         onClick={handleSidebarToggle}>
           <h3><i className="bi bi-list"></i></h3>
       </IconButton>
-      <h2>BigBrain</h2>
-      { getters.loggedIn && <LogoutWrapper><Logout/></LogoutWrapper>}
+      <HeaderButton onClick={handleDashboard}>BigBrain</HeaderButton>
+      { token && <LogoutWrapper><Logout/></LogoutWrapper>}
     </HeaderWrapper>
   )
 }

@@ -1,6 +1,6 @@
 import React from 'react';
-import useAppContext from '../utils/Context';
 import styled from 'styled-components';
+import { useAuth } from '../utils/Auth';
 
 import Logout from './Logout';
 
@@ -11,12 +11,12 @@ const OffcanvasStyled = styled(Offcanvas)`
 `;
 
 const Sidebar = () => {
-  const { getters, setters } = useAppContext();
+  const { token, sidebarOpen, setSidebarOpen } = useAuth();
 
   return (
-    <Collapse in={getters.sidebarOpen}>
+    <Collapse in={sidebarOpen}>
       <div>
-        <OffcanvasStyled show={getters.sidebarOpen} onHide={() => setters.setSidebarOpen(false)}>
+        <OffcanvasStyled show={sidebarOpen} onHide={() => setSidebarOpen(false)}>
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>BigBrain</Offcanvas.Title>
           </Offcanvas.Header>
@@ -25,7 +25,7 @@ const Sidebar = () => {
               <Col>
                 <Nav>
                   <Nav.Item>
-                    { getters.loggedIn && <Logout/> }
+                    { token && <Logout/> }
                   </Nav.Item>
                 </Nav>
               </Col>

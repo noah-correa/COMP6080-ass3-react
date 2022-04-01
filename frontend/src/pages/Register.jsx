@@ -1,8 +1,7 @@
-import React, { useRef, useState } from 'react';
-import useAppContext from '../utils/Context';
+import React, { useRef, useState, useEffect } from 'react';
+import { useAuth } from '../utils/Auth';
 import { Form, Button, Card } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import API from '../utils/API';
 
 // Components
 import Loading from '../components/Loading';
@@ -11,7 +10,7 @@ import Loading from '../components/Loading';
 import { Main, AuthCard, CardSubHeading } from '../styles/common';
 
 const Register = () => {
-  const { setters } = useAppContext();
+  const { register, token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -22,6 +21,11 @@ const Register = () => {
   const passwordRef = useRef('');
   const cpasswordRef = useRef('');
   const nameRef = useRef('');
+
+  // Check if logged in already
+  useEffect(() => {
+    if (token) navigate('/dashboard');
+  }, []);
 
   // Register Submit Button Handler
   const handleRegister = async (event) => {
@@ -37,7 +41,7 @@ const Register = () => {
       setErrors(prev => { return { ...prev, passwords: true } });
     } else {
       setLoading(true);
-      const data = await API.register(emailRef.current.value, passwordRef.current.value, nameRef.current.value);
+      const data = await register(emailRef.current.value, passwordRef.current.value, nameRef.current.value);
       setLoading(false);
       if (data.error) {
         console.error('Could not register user');
@@ -45,8 +49,6 @@ const Register = () => {
       } else {
         setValidated(true);
         setErrors({});
-        setters.setToken(data.token);
-        setters.setLoggedIn(true);
         navigate('/dashboard');
       }
     }

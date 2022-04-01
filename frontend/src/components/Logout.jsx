@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAppContext from '../utils/Context';
+import { useAuth } from '../utils/Auth';
 import API from '../utils/API';
 import { Button } from 'react-bootstrap';
 import styled from 'styled-components';
@@ -15,18 +15,16 @@ const LogoutButtonWrapper = styled(Button)`
 `;
 
 const Logout = () => {
-  const { getters, setters } = useAppContext();
+  const { token, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async (event) => {
     event.preventDefault();
-    const data = await API.logout(getters.token);
+    const data = await API.logout(token);
     if (data.error) {
       console.error('Invalid token');
     } else {
-      setters.setToken('');
-      setters.setLoggedIn(false);
-      localStorage.clear('bb_token');
+      await logout();
       navigate('/login');
     }
   }
