@@ -12,7 +12,7 @@
 
 ## 0. Change Log
 
-N/A
+* 04/04: Please note, if you are having trouble with react-router-dom I suggest upgrading react-scripts `npm install react-scripts@5`
 
 ## 1. Background & Motivation
 
@@ -295,7 +295,7 @@ Your assignment will be hand-marked by tutor(s) in the course according to the c
         <li>Implementation of extra features that are not included in the spec.</li>
         <li>Extra features should be non-trivial, have a clear justification for existing, and show either a form of technical, product, or creative flare.</li>
         <li>Any extra features written down in `BONUS.md` in the project folder</li>
-        <li>Any bonus marks that extend your ass3 mark above 100% will bleed into other assignment marks, but cannot contribute outside of the 75% of the course that is allocated for assignment marks</li>
+        <li>Any bonus marks that extend your ass3 mark above 100% will bleed into other assignment marks, but cannot contribute outside of the 80% of the course that is allocated for assignment marks</li>
         <li><b>Expectations placed on solo groups will be half of that of pairs to achieve the same mark.</b></li>
       </ul>
     </td>
