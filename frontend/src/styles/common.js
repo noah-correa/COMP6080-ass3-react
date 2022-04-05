@@ -32,6 +32,7 @@ export const Main = styled.main`
 export const AuthCard = styled(Card)`
     width: 60%;
     min-width: 300px;
+    max-width: 450px;
     text-align: center;
 `;
 

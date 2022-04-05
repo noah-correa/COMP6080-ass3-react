@@ -57,6 +57,10 @@ const API = {
   deleteQuiz: async (token, quizid) => {
     return await (await apiCall(`/admin/quiz/${quizid}`, 'DELETE', token)).json();
   },
+
+  updateQuiz: async (token, quizid, body) => {
+    return await (await apiCall(`/admin/quiz/${quizid}`, 'PUT', token, body)).json();
+  }
 }
 
 export default API;

@@ -10,7 +10,7 @@ import Loading from '../components/Loading';
 import { Main, AuthCard, CardSubHeading } from '../styles/common';
 
 const Register = () => {
-  const { register, token } = useAuth();
+  const { register, token, setTitle } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -24,6 +24,7 @@ const Register = () => {
 
   // Check if logged in already
   useEffect(() => {
+    setTitle('BigBrain');
     if (token) navigate('/dashboard');
   }, []);
 
