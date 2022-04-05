@@ -35,7 +35,7 @@ const QuestionCard = ({ quiz, question, updateQuiz }) => {
       <h5>Question {quiz.questions.indexOf(question) + 1}: </h5><p>{question.question}</p>
       <p>Type: {question.type}</p>
       { question.media.type === 'file' && <Image thumbnail src={question.media.content} alt='No image' width='100px' height='100px'/> }
-      { question.media.type === 'url' &&
+      { question.media.type === 'url' && question.media.content &&
                   <Ratio aspectRatio='16x9'>
                     <iframe
                       title='Question Media'
