@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Container, Image } from 'react-bootstrap';
-// import API from '../utils/API';
-// import { useAuth } from '../utils/Auth';
+import { Alert, Button, Image, Ratio } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-const QuestionCard = ({ quiz, question }) => {
-  // const { token } = useAuth();
+const QuestionCard = ({ quiz, question, updateQuiz }) => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
@@ -19,30 +16,48 @@ const QuestionCard = ({ quiz, question }) => {
   // Delete Button Handler
   const handleDelete = async (event) => {
     event.preventDefault();
+    const body = { ...quiz };
+    console.log(body);
+    const questions = [...body.questions];
+    console.log(questions);
+    const found = questions.indexOf(question);
+    console.log(found);
+    questions.splice(found, 1);
+    console.log(questions);
+    body.questions = questions;
+    console.log(body);
+    updateQuiz(body);
   }
 
   return (
-    // <Card className='shadow-sm mb-2'>
-    //   <Card.Body>
-    <Container>
+    <>
       { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
-      {/* <p>Id: {question.id}</p> */}
-      <p>Question: {question.question}</p>
+      <h5>Question {quiz.questions.indexOf(question) + 1}: </h5><p>{question.question}</p>
       <p>Type: {question.type}</p>
       { question.media.type === 'file' && <Image thumbnail src={question.media.content} alt='No image' width='100px' height='100px'/> }
+      { question.media.type === 'url' &&
+                  <Ratio aspectRatio='16x9'>
+                    <iframe
+                      title='Question Media'
+                      src={question.media.content}
+                      frameBorder="0"
+                      allow="accelerometer; clipboard-write; encrypted-media"
+                      allowFullScreen
+                    ></iframe>
+                  </Ratio>
+                }
       <p>Points: {question.points}</p>
       <p>Duration: {question.duration} seconds</p>
       <Button variant='primary' onClick={handleEdit}>Edit</Button>
       <Button variant='danger' onClick={handleDelete}>Delete</Button>
-    </Container>
-    //   </Card.Body>
-    // </Card>
+    </>
   )
 }
 
 QuestionCard.propTypes = {
   question: PropTypes.object.isRequired,
   quiz: PropTypes.object.isRequired,
+  updateQuiz: PropTypes.func.isRequired,
 }
 
 export default QuestionCard;

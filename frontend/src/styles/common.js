@@ -5,7 +5,7 @@ export const BodyWrapper = styled.div`
     display: flex;
     flex-direction: column;
     background-color: #46178f;
-    height: calc(100vh - 50px);
+    min-height: calc(100vh - 50px);
 `;
 
 export const ContentWrapper = styled.div`

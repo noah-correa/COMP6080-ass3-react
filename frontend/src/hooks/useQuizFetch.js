@@ -51,7 +51,7 @@ const useQuizFetch = (token, quizid) => {
     fetchQuiz(token, quizid);
   }, [token, quizid]);
 
-  return { quiz, quizLoading, quizError };
+  return { quiz, quizLoading, quizError, fetchQuiz };
 };
 
 export default useQuizFetch;

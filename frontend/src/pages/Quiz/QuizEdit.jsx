@@ -1,32 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Card, ListGroup, Button, Image, Form, FormControl, InputGroup } from 'react-bootstrap';
 import { useParams, useNavigate, Outlet } from 'react-router-dom';
-import QuestionCard from '../../components/QuestionCard';
 import useQuizFetch from '../../hooks/useQuizFetch';
+import QuestionCard from '../../components/QuestionCard';
 import API from '../../utils/API';
 import { useAuth } from '../../utils/Auth';
-import { fileToDataUrl } from '../../utils/utils';
+import { fileToDataUrl, generateId } from '../../utils/utils';
+
+// const defaultQuestion = {
+//   quizid: -1,
+//   questionid: -1,
+//   question: '',
+//   type: 'single',
+//   duration: 5,
+//   points: 0,
+//   media: {
+//     type: 'url',
+//     content: '',
+//   },
+//   answers: [],
+//   answer: [],
+// }
+
+// const defaultQuiz = {
+//   questions: [
+//     defaultQuestion,
+//   ],
+//   createdAt: '',
+//   name: '',
+//   thumbnail: '',
+//   owner: '',
+//   active: null,
+//   oldSessions: [],
+// };
 
 const QuizEdit = () => {
   const { quizid } = useParams();
   const { setTitle, token } = useAuth();
-  const { quiz } = useQuizFetch(token, quizid);
   const navigate = useNavigate();
-  const [quizCopy, setQuizCopy] = useState(quiz);
+  const { quiz, fetchQuiz } = useQuizFetch(token, quizid);
+  // const [quiz, setQuiz] = useState(defaultQuiz);
+  const [totalDuration, setTotalDuration] = useState(0);
   const [updateName, setUpdateName] = useState('');
   const [updateThumbnail, setUpdateThumbnail] = useState(null);
   const [thumbnailInvalid, setThumbnailInvalid] = useState(false);
 
-  // Update App Title
-  useEffect(() => {
-    setTitle('Edit Quiz');
-  }, []);
-
-  // Update Quiz Copy
-  useEffect(() => {
-    if (quiz) setQuizCopy(quiz);
-  }, [quiz]);
-
+  // Return if quiz id was invalid
   if (!quizid) {
     return (
       <Card>
@@ -37,15 +56,33 @@ const QuizEdit = () => {
     );
   }
 
+  // Update App Title
+  useEffect(() => {
+    setTitle('Edit Quiz');
+  }, []);
+
+  // Fetch quiz on token/quizid change
+  useEffect(() => {
+    fetchQuiz(token, quizid);
+  }, [token, quizid]);
+
+  // Calculate total time
+  useEffect(() => {
+    const total = quiz.questions.reduce((sum, q) => sum + q.duration, 0);
+    setTotalDuration(total);
+  }, [quiz])
+
+  // Update quiz field function
   const updateQuiz = async (body) => {
     const data = await API.updateQuiz(token, quizid, body);
     if (data.error) {
       console.error(data.error);
     } else {
-      navigate(0);
+      fetchQuiz(token, quizid);
     }
   }
 
+  // Name update handler
   const handleNameUpdate = async (event) => {
     event.preventDefault();
     const body = { ...quiz };
@@ -56,6 +93,7 @@ const QuizEdit = () => {
     }
   }
 
+  // Thumbnail update handler
   const handleThumbnailUpdate = async (event) => {
     event.preventDefault();
     const body = { ...quiz };
@@ -73,14 +111,16 @@ const QuizEdit = () => {
     }
   }
 
+  // New Question button handler
   const handleNewQuestion = (event) => {
     event.preventDefault();
-    navigate(`/quiz/edit/${quizid}/${quiz.questions.length + 1}`, { state: { quiz: quizCopy } });
+    const newId = generateId();
+    navigate(`/quiz/edit/${quizid}/${newId}`, { state: { quiz: quiz } });
   }
 
   return (
-    <Container>
-      <Card className='shadow mt-3'>
+    <Container className='mt-3 mb-3'>
+      <Card className='shadow'>
         <Card.Body>
           <Form>
             <InputGroup>
@@ -90,6 +130,7 @@ const QuizEdit = () => {
             </InputGroup>
             <p>Owner: {quiz.owner}</p>
             <p>Created: {new Date(quiz.createdAt).toLocaleString()}</p>
+            <p>Total Duration: {totalDuration} seconds</p>
             <InputGroup>
               <InputGroup.Text>Thumbnail</InputGroup.Text>
               <FormControl type='file' isInvalid={thumbnailInvalid} onChange={(e) => setUpdateThumbnail(e.target.files && e.target.files[0])}/>
@@ -109,8 +150,7 @@ const QuizEdit = () => {
             { quiz &&
               quiz.questions.map((question, index) => (
                 <ListGroup.Item key={index}>
-                  {/* Q{index + 1}: {question.question} */}
-                  <QuestionCard question={question} quiz={quiz}></QuestionCard>
+                  <QuestionCard question={question} quiz={quiz} updateQuiz={updateQuiz}></QuestionCard>
                 </ListGroup.Item>
               ))
             }

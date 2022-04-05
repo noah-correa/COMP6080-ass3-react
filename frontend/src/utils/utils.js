@@ -31,3 +31,27 @@ export function fileToDataUrl (file) {
   reader.readAsDataURL(file);
   return dataUrlPromise;
 }
+
+// Converts Youtube URL to embedded verison
+export const youtubeUrlEmbed = (url) => {
+  const embed = url.indexOf('embed');
+  if (embed > -1) return url;
+  else {
+    const watch = url.indexOf('watch?v=');
+    if (watch > -1) return `https://www.youtube.com/embed/${url.substring(watch + 8)}`;
+    else {
+      const short = url.indexOf('.be/');
+      if (short > -1) return `https://www.youtube.com/embed/${url.substring(short + 4)}`;
+    }
+  }
+  return null;
+}
+
+// Generate unique question ID
+const ids = [];
+export const generateId = (n = 5) => {
+  let id = Math.floor(Math.random() * Math.pow(10, n));
+  while (ids.includes(id)) id = Math.floor(Math.random() * Math.pow(10, n));
+  ids.push(id);
+  return id;
+}

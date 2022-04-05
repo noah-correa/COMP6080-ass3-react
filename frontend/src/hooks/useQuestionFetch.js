@@ -42,7 +42,7 @@ const useQuestionFetch = (token, quizid, questionid) => {
     fetchQuestion(token, quizid, questionid);
   }, [token, quizid, questionid]);
 
-  return { question, questionLoading, questionError };
+  return { question, questionLoading, questionError, fetchQuestion };
 };
 
 export default useQuestionFetch;

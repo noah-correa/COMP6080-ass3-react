@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../utils/Auth';
-import { Card, Container, Button, Form, ButtonGroup, ToggleButton, Row, Col, Alert, Image } from 'react-bootstrap';
+import { Card, Container, Button, Form, ButtonGroup, ToggleButton, Row, Col, Alert, Image, Ratio } from 'react-bootstrap';
 import useQuestionFetch from '../../hooks/useQuestionFetch';
 import API from '../../utils/API';
-import { fileToDataUrl } from '../../utils/utils';
+import { fileToDataUrl, youtubeUrlEmbed } from '../../utils/utils';
 
 // Components
 import QuestionAnswersForm from '../../components/QuestionAnswersForm';
@@ -38,19 +38,12 @@ const QuizQuestion = () => {
   const updateQuizQuestion = async (quiz, question) => {
     if (!quiz) return false;
     const found = quiz.questions.findIndex(({ questionid }) => questionid === question.questionid);
-    if (found === -1) {
-      // Question not found
-      quiz.questions.push(question);
-    } else {
-      // Question found
-      quiz.questions[found] = question
-    }
+    if (found === -1) quiz.questions.push(question);
+    else quiz.questions[found] = question;
     const data = await API.updateQuiz(token, quizid, quiz);
     if (data.error) {
       console.error(data.error);
-    } else {
-      return true;
-    }
+    } else return true;
     return false;
   }
 
@@ -61,6 +54,10 @@ const QuizQuestion = () => {
     body.quizid = parseInt(quizid, 10);
     body.questionid = parseInt(questionid, 10);
     body.media = media;
+    if (media.type === 'url') {
+      const url = youtubeUrlEmbed(media.content);
+      body.media.content = url;
+    }
     const numAnswers = answers.reduce((sum, curr) => sum + !!curr, 0);
     const numAnswer = answer.reduce((sum, curr) => sum + !!curr, 0);
     if (numAnswers < 2) {
@@ -82,11 +79,13 @@ const QuizQuestion = () => {
     if (updated) navigate(`/quiz/edit/${quizid}`);
   }
 
+  // Cancel button handler
   const handleCancel = (event) => {
     event.preventDefault();
     navigate(`/quiz/edit/${quizid}`);
   }
 
+  // Media change Handler
   const handleMediaUpload = async (event) => {
     if (media.type === 'file') {
       try {
@@ -224,16 +223,27 @@ const QuizQuestion = () => {
                     Image
                   </ToggleButton>
                 </ButtonGroup>
-                { media.type === 'file' && questionCopy.media.type === 'file' &&
-                  <Image thumbnail src={questionCopy.media.content} width='100px' height='100px'></Image>
-                }
                 <Form.Control
                   type={media.type}
                   onChange={handleMediaUpload}
-                  placeholder={media.type === 'url' ? 'https://www.youtube.com/' : ''}
-                  value={media.type === 'url' ? media.content : ''}
+                  placeholder={media.type === 'url' ? 'https://www.youtube.com/...' : ''}
+                  // value={media.type === 'url' ? media.content : ''}
                   isInvalid={media.type === 'file' && fileInvalid}
                 ></Form.Control>
+                { media.type === 'file' && questionCopy.media.type === 'file' && questionCopy.media.content !== '' &&
+                  <Image thumbnail src={questionCopy.media.content} width='100px' height='100px'></Image>
+                }
+                { media.type === 'url' && questionCopy.media.type === 'url' && questionCopy.media.content !== '' &&
+                  <Ratio aspectRatio='16x9'>
+                    <iframe
+                      title='Question Media'
+                      src={questionCopy.media.content}
+                      frameBorder="0"
+                      allow="accelerometer; clipboard-write; encrypted-media"
+                      allowFullScreen
+                    ></iframe>
+                  </Ratio>
+                }
                 {/* { media === 'url'
                   ? (<Form.Control
                       type='url'
