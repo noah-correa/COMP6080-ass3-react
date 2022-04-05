@@ -3,56 +3,45 @@ import { useAuth } from '../utils/Auth';
 import API from '../utils/API';
 import QuizCard from '../components/QuizCard';
 import { Container, Button, Card, Collapse, InputGroup, FormControl, Alert } from 'react-bootstrap';
+import useAllQuizzesFetch from '../hooks/useAllQuizzesFetch';
+import Loading from '../components/Loading';
 
 const Dashboard = () => {
   const { token, setTitle } = useAuth();
+  const { quizzes, quizzesLoading, quizzesError, fetchAllQuizzes } = useAllQuizzesFetch(token);
   const createQuizNameRef = useRef('');
   const [showCreateQuiz, setShowCreateQuiz] = useState(false);
   const [error, setError] = useState('');
-  const [quizzesError, setQuizzesError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [quizzes, setQuizzes] = useState([]);
 
   // Change document title
   useEffect(() => {
     setTitle('Dashboard');
   }, []);
 
-  // Fetch all quizzes function
-  const fetchAllQuizzes = async (token) => {
-    const data = await API.getAllQuizzes(token);
-    if (data.error) {
-      console.error(data.error);
-      setError('Could not get quizzes');
-    } else {
-      setQuizzes(data.quizzes);
-      setError('');
-    }
-  }
-
-  // Fetch all quizzes from backend
-  useEffect(async () => {
-    if (token) await fetchAllQuizzes(token);
-  }, [token]);
-
   // Create Quiz Button Handler
   const handleCreateQuiz = async (event) => {
     event.preventDefault();
     if (!createQuizNameRef.current.value) {
-      setQuizzesError('Invalid quiz name');
+      setError('Invalid quiz name');
     } else {
+      setLoading(true);
       const data = await API.createQuiz(token, createQuizNameRef.current.value);
       if (data.error) {
         console.error('Could not create quiz');
-        setQuizzesError('Could not create quiz, please try again later');
+        setError('Could not create quiz, please try again later');
       } else {
-        setQuizzesError('');
+        setError('');
         setSuccess(true);
         createQuizNameRef.current.value = '';
         fetchAllQuizzes(token);
       }
+      setLoading(false);
     }
   }
+
+  if (loading || quizzesLoading) return <Loading/>;
 
   return (
     <Container className='mt-3'>
@@ -71,11 +60,6 @@ const Dashboard = () => {
                     <FormControl placeholder='Enter quiz name' ref={createQuizNameRef}></FormControl>
                     <Button variant='outline-primary' onClick={handleCreateQuiz}>Create</Button>
                   </InputGroup>
-                  { quizzesError &&
-                    <Alert dismissible variant='danger' onClose={() => { setQuizzesError('') }}>
-                      { quizzesError }
-                    </Alert>
-                  }
                   { success &&
                     <Alert dismissible variant='success' onClose={() => { setSuccess(false) }}>
                       Quiz created!
@@ -85,12 +69,12 @@ const Dashboard = () => {
               </Collapse>
         </Card.Body>
       </Card>
-      { error && <Alert dismissible variant='danger' onClose={() => setError('')}>{error}</Alert>}
+      { (error || quizzesError) && <Alert dismissible variant='danger' onClose={() => setError('')}>{error || quizzesError}</Alert>}
       {
         quizzes.length === 0
           ? (<QuizCard empty/>)
           : (quizzes.map((quiz, index) => (
-              <QuizCard quiz={quiz} key={index} fetchQuizzes={fetchAllQuizzes}/>
+              <QuizCard quizid={quiz.id} key={index}/>
             )))
       }
     </Container>

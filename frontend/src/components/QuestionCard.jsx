@@ -29,7 +29,8 @@ const QuestionCard = ({ quiz, question, updateQuiz }) => {
       { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
       <h5>Question {quiz.questions.indexOf(question) + 1}: </h5><p>{question.question}</p>
       <p>Type: {question.type}</p>
-      { question.media.type === 'file' && <Image thumbnail src={question.media.content} alt='No image' width='100px' height='100px'/> }
+      { !question.media.content && <p>No media attached</p>}
+      { question.media.type === 'file' && question.media.content && <Image thumbnail src={question.media.content} alt='No image' width='100px' height='100px'/> }
       { question.media.type === 'url' && question.media.content &&
                   <Ratio aspectRatio='16x9'>
                     <iframe

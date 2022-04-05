@@ -60,7 +60,27 @@ const API = {
 
   updateQuiz: async (token, quizid, body) => {
     return await (await apiCall(`/admin/quiz/${quizid}`, 'PUT', token, body)).json();
-  }
+  },
+
+  startGame: async (token, quizid) => {
+    return await (await apiCall(`/admin/quiz/${quizid}/start`, 'POST', token)).json();
+  },
+
+  advanceGame: async (token, quizid) => {
+    return await (await apiCall(`/admin/quiz/${quizid}/advance`, 'POST', token)).json();
+  },
+
+  endGame: async (token, quizid) => {
+    return await (await apiCall(`/admin/quiz/${quizid}/end`, 'POST', token)).json();
+  },
+
+  sessionStatus: async (token, sessionid) => {
+    return await (await apiCall(`/admin/session/${sessionid}/status`, 'GET', token)).json();
+  },
+
+  sessionResults: async (token, sessionid) => {
+    return await (await apiCall(`/admin/session/${sessionid}/results`, 'GET', token)).json();
+  },
 }
 
 export default API;

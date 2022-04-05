@@ -9,13 +9,15 @@ import { fileToDataUrl, youtubeUrlEmbed } from '../../utils/utils';
 
 // Components
 import QuestionAnswersForm from '../../components/QuestionAnswersForm';
+import Loading from '../../components/Loading';
 
 const QuizQuestionEdit = () => {
   const { quizid, questionid } = useParams();
   const { token, setTitle } = useAuth();
   const { state } = useLocation();
-  const { question } = useQuestionFetch(token, quizid, questionid);
+  const { question, questionLoading } = useQuestionFetch(token, quizid, questionid);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [media, setMedia] = useState({ type: 'url', content: '' });
   const [questionCopy, setQuestionCopy] = useState(question);
@@ -45,7 +47,9 @@ const QuizQuestionEdit = () => {
     const found = quiz.questions.findIndex(({ questionid }) => questionid === question.questionid);
     if (found === -1) quiz.questions.push(question);
     else quiz.questions[found] = question;
+    setLoading(true);
     const data = await API.updateQuiz(token, quizid, quiz);
+    setLoading(false);
     if (data.error) {
       console.error(data.error);
     } else return true;
@@ -99,6 +103,8 @@ const QuizQuestionEdit = () => {
       }
     } else setMedia({ type: 'url', content: event.target.value });
   }
+
+  if (loading || questionLoading) return <Loading/>;
 
   return (
     <Container>

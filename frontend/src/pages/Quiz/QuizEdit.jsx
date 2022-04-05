@@ -6,40 +6,14 @@ import QuestionCard from '../../components/QuestionCard';
 import API from '../../utils/API';
 import { useAuth } from '../../utils/Auth';
 import { fileToDataUrl, generateId } from '../../utils/utils';
-
-// const defaultQuestion = {
-//   quizid: -1,
-//   questionid: -1,
-//   question: '',
-//   type: 'single',
-//   duration: 5,
-//   points: 0,
-//   media: {
-//     type: 'url',
-//     content: '',
-//   },
-//   answers: [],
-//   answer: [],
-// }
-
-// const defaultQuiz = {
-//   questions: [
-//     defaultQuestion,
-//   ],
-//   createdAt: '',
-//   name: '',
-//   thumbnail: '',
-//   owner: '',
-//   active: null,
-//   oldSessions: [],
-// };
+import Loading from '../../components/Loading';
 
 const QuizEdit = () => {
   const { quizid } = useParams();
   const { setTitle, token } = useAuth();
   const navigate = useNavigate();
-  const { quiz, fetchQuiz } = useQuizFetch(token, quizid);
-  // const [quiz, setQuiz] = useState(defaultQuiz);
+  const { quiz, quizLoading, fetchQuiz } = useQuizFetch(token, quizid);
+  const [loading, setLoading] = useState(false);
   const [totalDuration, setTotalDuration] = useState(0);
   const [updateName, setUpdateName] = useState('');
   const [updateThumbnail, setUpdateThumbnail] = useState(null);
@@ -61,11 +35,6 @@ const QuizEdit = () => {
     setTitle('Edit Quiz');
   }, []);
 
-  // Fetch quiz on token/quizid change
-  useEffect(() => {
-    fetchQuiz(token, quizid);
-  }, [token, quizid]);
-
   // Calculate total time
   useEffect(() => {
     const total = quiz.questions.reduce((sum, q) => sum + q.duration, 0);
@@ -74,12 +43,14 @@ const QuizEdit = () => {
 
   // Update quiz field function
   const updateQuiz = async (body) => {
+    setLoading(true);
     const data = await API.updateQuiz(token, quizid, body);
     if (data.error) {
       console.error(data.error);
     } else {
       fetchQuiz(token, quizid);
     }
+    setLoading(false);
   }
 
   // Name update handler
@@ -117,6 +88,8 @@ const QuizEdit = () => {
     const newId = generateId();
     navigate(`/quiz/edit/${quizid}/${newId}`, { state: { quiz: quiz } });
   }
+
+  if (loading || quizLoading) return <Loading/>;
 
   return (
     <Container className='mt-3 mb-3'>

@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Card, Image } from 'react-bootstrap';
+import { Alert, Button, Card, Image, Modal } from 'react-bootstrap';
 import API from '../utils/API';
 import { useAuth } from '../utils/Auth';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useQuizFetch from '../hooks/useQuizFetch';
+import Loading from './Loading';
 
-const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
+const QuizCard = ({ empty, quizid }) => {
   const { token } = useAuth();
   const navigate = useNavigate();
+  const { quiz, quizLoading, fetchQuiz } = useQuizFetch(token, quizid);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [questions, setQuestions] = useState([]);
   const [duration, setDuration] = useState(0);
+  const [showStartPopup, setShowStartPopup] = useState(false);
+  const [showStopPopup, setShowStopPopup] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
 
   // Empty Quiz Card
   if (empty) {
@@ -25,8 +32,9 @@ const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
 
   // Fetch questions from backend
   useEffect(async () => {
-    if (quiz.id) {
-      const data = await API.getQuiz(token, quiz.id);
+    if (quizid) {
+      setLoading(true);
+      const data = await API.getQuiz(token, quizid);
       if (data.error) {
         console.error(data.error);
         setError('Could not fetch quiz');
@@ -34,6 +42,7 @@ const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
         setError('');
         setQuestions(data.questions);
       }
+      setLoading(false);
     }
   }, []);
 
@@ -49,44 +58,112 @@ const QuizCard = ({ empty, quiz, fetchQuizzes }) => {
   }, [questions]);
 
   // View Button Handler
-  const handleEdit = async (event) => {
+  const handleEdit = (event) => {
     event.preventDefault();
-    navigate(`/quiz/edit/${quiz.id}`);
+    navigate(`/quiz/edit/${quizid}`);
   }
 
   // Delete Button Handler
   const handleDelete = async (event) => {
     event.preventDefault();
-    const data = await API.deleteQuiz(token, quiz.id);
+    setLoading(true);
+    const data = await API.deleteQuiz(token, quizid);
     if (data.error) {
       setError('Could not delete quiz');
     } else {
-      fetchQuizzes(token);
+      fetchQuiz(token, quizid);
     }
+    setLoading(false);
   }
 
+  // Start game handler
+  const handleStart = async (event, quizid) => {
+    event.preventDefault();
+    setLoading(true);
+    const data = await API.startGame(token, quizid);
+    if (data.error) {
+      console.error(data.error);
+    } else {
+      fetchQuiz(token, quizid);
+      setShowStartPopup(true);
+    }
+    setLoading(false);
+  }
+
+  // Stop game handler
+  const handleStop = async (event, quizid) => {
+    event.preventDefault();
+    setLoading(true);
+    setSessionId(quiz.active);
+    const data = await API.endGame(token, quizid);
+    if (data.error) {
+      console.error(data.error);
+    } else {
+      fetchQuiz(token, quizid);
+      setShowStopPopup(true);
+    }
+    setLoading(false);
+  }
+
+  // Create session url
+  const generateSessionUrl = (sessionid) => {
+    return window.location.href.replace('dashboard', `quiz/play/${sessionid}`);
+  }
+
+  const handleViewResults = async (event) => {
+    event.preventDefault();
+    navigate(`/quiz/play/${sessionId}/results`, { state: { sessionid: sessionId } });
+  }
+
+  if (loading || quizLoading) return <Loading/>;
+
   return (
-    <Card className='shadow-sm mb-2'>
-      <Card.Body>
-        { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
-        <p>Id: {quiz.id}</p>
-        <p>Created: {quiz.createdAt}</p>
-        <p>Name: {quiz.name}</p>
-        <Image thumbnail src={quiz.thumbnail} alt='No image' width='50px' height='50px'/>
-        <p>Owner: {quiz.owner}</p>
-        <p>Duration: {duration} seconds</p>
-        <p>{ questions.length } question{ questions.length === 1 ? '' : 's' }</p>
-        <Button variant='primary' onClick={handleEdit}>Edit</Button>
-        <Button variant='danger' onClick={handleDelete}>Delete</Button>
-      </Card.Body>
-    </Card>
+    <>
+      <Card className='shadow-sm mb-2'>
+        <Card.Body>
+          { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
+          <h4>{quiz.name}</h4>
+          <p>Id: {quizid}</p>
+          <p>Created: {quiz.createdAt}</p>
+          <Image thumbnail src={quiz.thumbnail} alt='No image' width='100px' height='100px'/>
+          <p>Owner: {quiz.owner}</p>
+          <p>Total Duration: {duration} seconds</p>
+          <p>{ questions.length } question{ questions.length === 1 ? '' : 's' }</p>
+          { quiz.active && <p>Active Room: <Link to={`/quiz/play/${quiz.active}`} target='_blank'>{quiz.active}</Link></p> }
+          <Button variant='primary' onClick={handleEdit}>Edit</Button>
+          <Button variant='danger' onClick={handleDelete}>Delete</Button>
+          { quiz.active
+            ? <Button variant='warning' onClick={(e) => handleStop(e, quizid)}>Stop</Button>
+            : <Button variant='success' onClick={(e) => handleStart(e, quizid)}>Start</Button>
+          }
+        </Card.Body>
+      </Card>
+      <Modal show={showStartPopup} onHide={() => setShowStartPopup(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>New Session Started</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Open session in new tab: <Link to={`/quiz/play/${quiz.active}`} target='_blank'>{quiz.active || ''}</Link></p>
+            { quiz.active && <Button variant='primary' onClick={() => navigator.clipboard.writeText(generateSessionUrl(quiz.active))}>Copy Session Link</Button> }
+          </Modal.Body>
+      </Modal>
+      <Modal show={showStopPopup} onHide={() => setShowStopPopup(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Session Ended</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Would you like to view the results?</p>
+            <Button variant='primary' onClick={handleViewResults}>Yes</Button>
+            <Button variant='danger' onClick={() => setShowStopPopup(false)}>No</Button>
+          </Modal.Body>
+      </Modal>
+    </>
   )
 }
 
 QuizCard.propTypes = {
   empty: PropTypes.bool,
-  quiz: PropTypes.object,
-  fetchQuizzes: PropTypes.func,
+  quizid: PropTypes.number,
 }
 
 export default QuizCard;
