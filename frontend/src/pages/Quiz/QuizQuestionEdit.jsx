@@ -10,14 +10,14 @@ import { fileToDataUrl, youtubeUrlEmbed } from '../../utils/utils';
 // Components
 import QuestionAnswersForm from '../../components/QuestionAnswersForm';
 
-const QuizQuestion = () => {
+const QuizQuestionEdit = () => {
   const { quizid, questionid } = useParams();
   const { token, setTitle } = useAuth();
   const { state } = useLocation();
   const { question } = useQuestionFetch(token, quizid, questionid);
   const navigate = useNavigate();
   const [error, setError] = useState('');
-  const [media, setMedia] = useState(question.media);
+  const [media, setMedia] = useState({ type: 'url', content: '' });
   const [questionCopy, setQuestionCopy] = useState(question);
   const [answers, setAnswers] = useState(questionCopy.answers);
   const [answer, setAnswer] = useState(questionCopy.answer);
@@ -32,6 +32,11 @@ const QuizQuestion = () => {
   // Update question copy
   useEffect(() => {
     if (question) setQuestionCopy(question);
+  }, [question]);
+
+  // Update question copy
+  useEffect(() => {
+    if (question.media) setMedia(question.media);
   }, [question]);
 
   // Update Quiz Question Call
@@ -55,8 +60,10 @@ const QuizQuestion = () => {
     body.questionid = parseInt(questionid, 10);
     body.media = media;
     if (media.type === 'url') {
-      const url = youtubeUrlEmbed(media.content);
-      body.media.content = url;
+      if (media.content) {
+        const url = youtubeUrlEmbed(media.content);
+        body.media.content = url;
+      } else body.media.content = '';
     }
     const numAnswers = answers.reduce((sum, curr) => sum + !!curr, 0);
     const numAnswer = answer.reduce((sum, curr) => sum + !!curr, 0);
@@ -77,12 +84,6 @@ const QuizQuestion = () => {
     }
     const updated = await updateQuizQuestion(state.quiz, body);
     if (updated) navigate(`/quiz/edit/${quizid}`);
-  }
-
-  // Cancel button handler
-  const handleCancel = (event) => {
-    event.preventDefault();
-    navigate(`/quiz/edit/${quizid}`);
   }
 
   // Media change Handler
@@ -223,6 +224,7 @@ const QuizQuestion = () => {
                     Image
                   </ToggleButton>
                 </ButtonGroup>
+                <Button variant='outline-danger' onClick={() => setMedia({ type: media.type, content: '' })}>Remove Media</Button>
                 <Form.Control
                   type={media.type}
                   onChange={handleMediaUpload}
@@ -230,14 +232,14 @@ const QuizQuestion = () => {
                   // value={media.type === 'url' ? media.content : ''}
                   isInvalid={media.type === 'file' && fileInvalid}
                 ></Form.Control>
-                { media.type === 'file' && questionCopy.media.type === 'file' && questionCopy.media.content !== '' &&
-                  <Image thumbnail src={questionCopy.media.content} width='100px' height='100px'></Image>
+                { media.type === 'file' && media.content && questionCopy.media.type === 'file' && questionCopy.media.content !== '' &&
+                  <Image thumbnail src={media.content} width='100px' height='100px'></Image>
                 }
-                { media.type === 'url' && questionCopy.media.type === 'url' && questionCopy.media.content !== '' &&
+                { media.type === 'url' && media.content && questionCopy.media.type === 'url' && questionCopy.media.content !== '' &&
                   <Ratio aspectRatio='16x9'>
                     <iframe
                       title='Question Media'
-                      src={questionCopy.media.content}
+                      src={media.content}
                       frameBorder="0"
                       allow="accelerometer; clipboard-write; encrypted-media"
                       allowFullScreen
@@ -273,7 +275,7 @@ const QuizQuestion = () => {
               </Form.Group>
             </Form>
             <Button variant='primary' onClick={handleSave}>Save</Button>
-            <Button variant='danger' onClick={handleCancel}>Cancel</Button>
+            <Button variant='danger' onClick={() => navigate(`/quiz/edit/${quizid}`)}>Cancel</Button>
           </Container>
         </Card.Body>
       </Card>
@@ -282,9 +284,9 @@ const QuizQuestion = () => {
   )
 }
 
-QuizQuestion.propTypes = {
+QuizQuestionEdit.propTypes = {
   updateQuestion: PropTypes.func,
   questions: PropTypes.array
 }
 
-export default QuizQuestion;
+export default QuizQuestionEdit;

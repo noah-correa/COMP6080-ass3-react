@@ -13,20 +13,16 @@ import PropTypes from 'prop-types';
 const QuestionAnswersForm = ({ questionType, setAnswersList, setAnswer, answersList, answer }) => {
   const [answers, setAnswers] = useState(['', '', '', '', '', '']);
   const [valid, setValid] = useState([false, false, false, false, false, false]);
-  // console.log(answersList);
-  // console.log(answer);
 
   // Update intermediate answers list
   useEffect(() => {
     const newAnswers = answersList.concat(Array(6).fill('')).slice(0, 6);
-    // console.log(newAnswers);
     setAnswers(newAnswers);
   }, [answersList]);
 
   // Update intermediate correct answer list
   useEffect(() => {
     const newValid = answer.concat(Array(6).fill(false)).slice(0, 6);
-    // console.log(newValid);
     setValid(newValid);
   }, [answer]);
 

@@ -1,14 +1,14 @@
 import React from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Page Components
 import PrivateRoute from '../components/PrivateRoute';
-// import PrivateOutlet from '../components/PrivateOutlet';
+import PrivateOutlet from '../components/PrivateOutlet';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import QuizEdit from '../pages/Quiz/QuizEdit';
-import QuizQuestion from '../pages/Quiz/QuizQuestion';
+import QuizQuestionEdit from '../pages/Quiz/QuizQuestionEdit';
 
 const Router = () => {
   return (
@@ -17,9 +17,9 @@ const Router = () => {
       <Route path='/login' element={<Login/>} />
       <Route path='/register' element={<Register/>} />
       <Route path='/dashboard' element={<PrivateRoute><Dashboard/></PrivateRoute>}/>
-      <Route path='/quiz/edit' element={<Outlet/>}>
+      <Route path='/quiz/edit' element={<PrivateOutlet/>}>
         <Route path=':quizid' element={<QuizEdit/>}/>
-        <Route path=':quizid/:questionid' element={<QuizQuestion/>}/>
+        <Route path=':quizid/:questionid' element={<QuizQuestionEdit/>}/>
       </Route>
     </Routes>
   );

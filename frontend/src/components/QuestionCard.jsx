@@ -17,15 +17,10 @@ const QuestionCard = ({ quiz, question, updateQuiz }) => {
   const handleDelete = async (event) => {
     event.preventDefault();
     const body = { ...quiz };
-    console.log(body);
     const questions = [...body.questions];
-    console.log(questions);
     const found = questions.indexOf(question);
-    console.log(found);
     questions.splice(found, 1);
-    console.log(questions);
     body.questions = questions;
-    console.log(body);
     updateQuiz(body);
   }
 
