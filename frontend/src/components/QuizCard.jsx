@@ -22,7 +22,7 @@ const QuizCard = ({ empty, quizid }) => {
   // Empty Quiz Card
   if (empty) {
     return (
-      <Card className='shadow-sm mb-2'>
+      <Card className='shadow'>
         <Card.Body className='text-center'>
           <i>No quizzes to display</i>
         </Card.Body>
@@ -119,7 +119,7 @@ const QuizCard = ({ empty, quizid }) => {
 
   return (
     <>
-      <Card className='shadow-sm mb-2'>
+      <Card className='shadow'>
         <Card.Body>
           { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
           <h4>{quiz.name}</h4>

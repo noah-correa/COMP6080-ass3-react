@@ -11,6 +11,7 @@ import QuizEdit from '../pages/Quiz/QuizEdit';
 import QuizQuestionEdit from '../pages/Quiz/QuizQuestionEdit';
 import SessionLobby from '../pages/Session/SessionLobby';
 import SessionResults from '../pages/Session/SessionResults';
+import SessionJoin from '../pages/Session/SessionJoin';
 
 const Router = () => {
   return (
@@ -25,8 +26,9 @@ const Router = () => {
       </Route>
       <Route path='quiz/play' element={<Outlet/>}>
         <Route path=':sessionid' element={<SessionLobby/>}/>
-        <Route path=':sessionid/results' element={<SessionResults/>}/>
+        <Route path=':sessionid/results' element={<PrivateRoute><SessionResults/></PrivateRoute>}/>
       </Route>
+      <Route path='quiz/join' element={<SessionJoin/>}/>
     </Routes>
   );
 }

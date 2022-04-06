@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Card, ListGroup, Button, Image, Form, FormControl, InputGroup } from 'react-bootstrap';
+import { Card, ListGroup, Button, Image, Form, FormControl, InputGroup } from 'react-bootstrap';
 import { useParams, useNavigate, Outlet } from 'react-router-dom';
 import useQuizFetch from '../../hooks/useQuizFetch';
 import QuestionCard from '../../components/QuestionCard';
@@ -7,6 +7,7 @@ import API from '../../utils/API';
 import { useAuth } from '../../utils/Auth';
 import { fileToDataUrl, generateId } from '../../utils/utils';
 import Loading from '../../components/Loading';
+import ContentWrapper from '../../components/ContentWrapper';
 
 const QuizEdit = () => {
   const { quizid } = useParams();
@@ -22,11 +23,13 @@ const QuizEdit = () => {
   // Return if quiz id was invalid
   if (!quizid) {
     return (
-      <Card>
-        <Card.Body className='shadow mt-3'>
-          <p>Invalid Quiz</p>
-        </Card.Body>
-      </Card>
+      <ContentWrapper>
+        <Card className='shadow'>
+          <Card.Body>
+            <p>Invalid Quiz</p>
+          </Card.Body>
+        </Card>
+      </ContentWrapper>
     );
   }
 
@@ -92,7 +95,7 @@ const QuizEdit = () => {
   if (loading || quizLoading) return <Loading/>;
 
   return (
-    <Container className='mt-3 mb-3'>
+    <ContentWrapper>
       <Card className='shadow'>
         <Card.Body>
           <Form>
@@ -114,9 +117,9 @@ const QuizEdit = () => {
           </Form>
         </Card.Body>
       </Card>
-      <Card className='shadow mt-2'>
+      <Card className='shadow'>
         <Card.Body>
-          <div className='d-grid gap-2 mb-2'>
+          <div className='d-grid gap-2'>
             <Button variant='primary' onClick={handleNewQuestion}>Add new question</Button>
           </div>
           <ListGroup>
@@ -131,7 +134,7 @@ const QuizEdit = () => {
         </Card.Body>
       </Card>
       <Outlet/>
-    </Container>
+    </ContentWrapper>
   )
 }
 

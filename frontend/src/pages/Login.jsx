@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../utils/Auth';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-
 // Components
 import Loading from '../components/Loading';
-
+import ContentWrapper from '../components/ContentWrapper';
 // Styled Components
-import { Main, AuthCard, CardSubHeading } from '../styles/common';
+import { AuthCard, CardSubHeading } from '../styles/common';
 
 const Login = () => {
   const { login, token, setTitle } = useAuth();
@@ -54,7 +53,7 @@ const Login = () => {
   if (loading) return <Loading/>;
 
   return (
-    <Main>
+    <ContentWrapper center>
       <AuthCard>
         <Card.Body>
           <CardSubHeading>Login</CardSubHeading>
@@ -78,7 +77,7 @@ const Login = () => {
           <Link to="/register">Don&apos;t have an account? Register</Link>
         </Card.Body>
       </AuthCard>
-    </Main>
+    </ContentWrapper>
   );
 }
 

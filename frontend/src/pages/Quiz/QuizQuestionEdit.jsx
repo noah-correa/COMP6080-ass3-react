@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../utils/Auth';
-import { Card, Container, Button, Form, ButtonGroup, ToggleButton, Row, Col, Alert, Image, Ratio } from 'react-bootstrap';
+import { Card, Button, Form, ButtonGroup, ToggleButton, Row, Col, Alert, Image, Ratio } from 'react-bootstrap';
 import useQuestionFetch from '../../hooks/useQuestionFetch';
 import API from '../../utils/API';
 import { fileToDataUrl, youtubeUrlEmbed } from '../../utils/utils';
@@ -10,6 +10,7 @@ import { fileToDataUrl, youtubeUrlEmbed } from '../../utils/utils';
 // Components
 import QuestionAnswersForm from '../../components/QuestionAnswersForm';
 import Loading from '../../components/Loading';
+import ContentWrapper from '../../components/ContentWrapper';
 
 const QuizQuestionEdit = () => {
   const { quizid, questionid } = useParams();
@@ -107,14 +108,13 @@ const QuizQuestionEdit = () => {
   if (loading || questionLoading) return <Loading/>;
 
   return (
-    <Container>
-      <Card className='shadow mt-3'>
+    <ContentWrapper>
+      <Card className='shadow'>
         <Card.Body>
-          <Container>
             { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
             <Form>
               {/* Question Input */}
-              <Form.Group className='mb-3'>
+              <Form.Group>
                 <Form.Label>Question</Form.Label>
                 <Form.Control
                   type='text'
@@ -130,7 +130,7 @@ const QuizQuestionEdit = () => {
               {/* Question Type Buttons */}
               <Form.Group>
                 <Form.Label>Question Type:</Form.Label><br/>
-                <ButtonGroup className='mb-2'>
+                <ButtonGroup>
                   <ToggleButton
                     name='typeChoice'
                     id='single'
@@ -159,7 +159,6 @@ const QuizQuestionEdit = () => {
               {/* Time Limit Input */}
               <Form.Group>
                 <Form.Label>Time Limit:</Form.Label>
-                <Container fluid>
                   {/* TODO: Make two sliders, one for minutes and seconds */}
                   <Row>
                     <Col>
@@ -192,11 +191,10 @@ const QuizQuestionEdit = () => {
                       <Form.Label>seconds</Form.Label>
                     </Col>
                   </Row>
-                </Container>
               </Form.Group>
 
               {/* Points Input */}
-              <Form.Group className='mb-2'>
+              <Form.Group>
                 <Form.Label>Points:</Form.Label>
                 <Form.Control
                   type='number'
@@ -210,9 +208,9 @@ const QuizQuestionEdit = () => {
               </Form.Group>
 
               {/* Media Input */}
-              <Form.Group className='mb-2'>
+              <Form.Group>
                 <Form.Label>Media:</Form.Label><br/>
-                <ButtonGroup className='mb-2'>
+                <ButtonGroup>
                   <ToggleButton
                     name='mediaChoice'
                     type='radio'
@@ -269,7 +267,7 @@ const QuizQuestionEdit = () => {
               </Form.Group>
 
               {/* Answers Input */}
-              <Form.Group className='mb-2'>
+              <Form.Group>
                 <Form.Label>Answers:</Form.Label><br/>
                 <QuestionAnswersForm
                   questionType={questionCopy.type}
@@ -282,10 +280,9 @@ const QuizQuestionEdit = () => {
             </Form>
             <Button variant='primary' onClick={handleSave}>Save</Button>
             <Button variant='danger' onClick={() => navigate(`/quiz/edit/${quizid}`)}>Cancel</Button>
-          </Container>
         </Card.Body>
       </Card>
-    </Container>
+    </ContentWrapper>
 
   )
 }

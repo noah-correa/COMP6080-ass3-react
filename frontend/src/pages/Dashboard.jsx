@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../utils/Auth';
 import API from '../utils/API';
 import QuizCard from '../components/QuizCard';
-import { Container, Button, Card, Collapse, InputGroup, FormControl, Alert } from 'react-bootstrap';
+import { Button, Card, Collapse, InputGroup, FormControl, Alert } from 'react-bootstrap';
 import useAllQuizzesFetch from '../hooks/useAllQuizzesFetch';
 import Loading from '../components/Loading';
+import ContentWrapper from '../components/ContentWrapper';
 
 const Dashboard = () => {
   const { token, setTitle } = useAuth();
@@ -44,8 +45,8 @@ const Dashboard = () => {
   if (loading || quizzesLoading) return <Loading/>;
 
   return (
-    <Container className='mt-3'>
-      <Card className='shadow-sm mb-3'>
+    <ContentWrapper>
+      <Card className='shadow'>
         <Card.Body className='d-grid gap-2'>
             <Button
               variant='primary'
@@ -77,7 +78,7 @@ const Dashboard = () => {
               <QuizCard quizid={quiz.id} key={index}/>
             )))
       }
-    </Container>
+    </ContentWrapper>
   )
 }
 

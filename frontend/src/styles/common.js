@@ -5,11 +5,7 @@ export const BodyWrapper = styled.div`
     display: flex;
     flex-direction: column;
     background-color: #46178f;
-    min-height: calc(100vh - 50px);
-`;
-
-export const ContentWrapper = styled.div`
-    flex: 1 0 auto;
+    min-height: calc(100vh - 100px);
 `;
 
 export const FooterCard = styled.footer`
@@ -19,14 +15,7 @@ export const FooterCard = styled.footer`
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    height: 8vh;
-`;
-
-export const Main = styled.main`
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 50px;
 `;
 
 export const AuthCard = styled(Card)`

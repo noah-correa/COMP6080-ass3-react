@@ -7,7 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 
 // Styled Components
-import { Main, AuthCard, CardSubHeading } from '../styles/common';
+import { AuthCard, CardSubHeading } from '../styles/common';
+import ContentWrapper from '../components/ContentWrapper';
 
 const Register = () => {
   const { register, token, setTitle } = useAuth();
@@ -58,7 +59,7 @@ const Register = () => {
   if (loading) return <Loading/>;
 
   return (
-    <Main>
+    <ContentWrapper center>
       <AuthCard>
         <Card.Body>
           <CardSubHeading>Register</CardSubHeading>
@@ -93,7 +94,7 @@ const Register = () => {
           <Link to="/login">Already have an account? Login</Link>
         </Card.Body>
       </AuthCard>
-    </Main>
+    </ContentWrapper>
   );
 }
 
