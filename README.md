@@ -13,6 +13,7 @@
 ## 0. Change Log
 
 * 04/04: Please note, if you are having trouble with react-router-dom I suggest upgrading react-scripts `npm install react-scripts@5`
+* 10/04: Submit command updated; multiple choice definition expanded on
 
 ## 1. Background & Motivation
 
@@ -71,6 +72,8 @@ A series of features below need to be implemented in your ReactJS app to operate
  * A unique route must exist for this screen that is parameterised both on the Game ID and the question ID
  * Editable items on this page include:
    * The question type (multiple choice, single choice)
+     * Single choice questions have multiple answers the player can guess, but only one is correct
+     * Multiple choice questions have multiple answers the player can guess, but multiple are correct and they must select all correct ones
    * The question itself (as a string)
    * Time limit that users have to answer the question
    * Points for how much the question is worth
@@ -336,7 +339,7 @@ This assignment is due *Thursday 21st of April, 10:00am*.
 
 To submit your assignment, you must complete the following two steps in order:
  * Ensure you've pushed all of your code to your gitlab master branch. You can check if you've done this properly by seeing what code is on the gitlab site on your master branch.
- * Run the following command on a CSE terminal (SSH, vlab): `$ 6080 submit ass3`
+ * Run the following command on a CSE terminal (SSH, vlab): `$ 6080 submit ass3 [groupname]` where `[groupname]` is the group name you have been assigned on gitlab.
 
 This will submit the latest commit on master as your submission.
 
