@@ -4,6 +4,7 @@ import { useAuth } from '../utils/Auth';
 import API from '../utils/API';
 import { Button } from 'react-bootstrap';
 import styled from 'styled-components';
+import { MdOutlineLogout } from 'react-icons/md';
 
 const LogoutButtonWrapper = styled(Button)`
   color: white;
@@ -31,7 +32,7 @@ const Logout = () => {
 
   return (
     <LogoutButtonWrapper variant='secondary' onClick={handleLogout}>
-      <i className="bi bi-box-arrow-right"></i> Logout
+      <MdOutlineLogout/> Logout
     </LogoutButtonWrapper>
   )
 }

@@ -5,6 +5,7 @@ import { Card, Spinner } from 'react-bootstrap';
 import { AuthCard } from '../../styles/common';
 import PlayQuestionCard from '../../components/PlayQuestionCard';
 import API from '../../utils/API';
+import PlayResults from '../../components/PlayResults';
 
 const SessionPlay = () => {
   const { sessionid } = useParams();
@@ -16,6 +17,8 @@ const SessionPlay = () => {
   const [questionEnd, setQuestionEnd] = useState(false);
   const [questionStartTime, setQuestionStartTime] = useState('');
   const [quizEnd, setQuizEnd] = useState(false);
+  const [allQuestions, setAllQuestions] = useState([]);
+  const [results, setResults] = useState([]);
 
   // Check if player is logged in
   useEffect(() => {
@@ -93,6 +96,32 @@ const SessionPlay = () => {
     return () => clearInterval(timer);
   }, [questionEnd]);
 
+  // Fetch player results from backend
+  const fetchResults = async (pid) => {
+    const id = parseInt(pid, 10);
+    const data = await API.getPlayerResults(id);
+    if (!data.error) {
+      setResults(data);
+    }
+  }
+
+  // Fetch results on quiz end
+  useEffect(() => {
+    if (quizEnd) {
+      if (playerid) fetchResults(playerid);
+    }
+  }, [quizEnd, playerid]);
+
+  // Append new questions to all question list
+  useEffect(() => {
+    if (Object.keys(playerQuestion).length !== 0) {
+      setAllQuestions(prev => {
+        if (!prev.some((q) => q.questionid === playerQuestion.questionid)) return [...prev, playerQuestion];
+        return [...prev];
+      });
+    }
+  }, [playerQuestion]);
+
   // Render Lobby Screen
   if (!playerStatus) {
     return (
@@ -111,14 +140,14 @@ const SessionPlay = () => {
     <ContentWrapper center>
         <Card className='shadow'>
           <Card.Body>
-            { playerQuestion &&
-              <PlayQuestionCard
-                question={playerQuestion}
-                playerid={playerid}
-                quizEnd={quizEnd}
-                questionEnd={questionEnd}
-                setQuestionEnd={setQuestionEnd}
-              />
+            { !quizEnd
+              ? <PlayQuestionCard
+                  question={playerQuestion}
+                  playerid={playerid}
+                  questionEnd={questionEnd}
+                  setQuestionEnd={setQuestionEnd}
+                />
+              : <PlayResults results={results} questions={allQuestions}/>
             }
           </Card.Body>
         </Card>

@@ -6,7 +6,7 @@ import CountdownTimer from './CountdownTimer';
 import API from '../utils/API';
 import QuizOptions from './QuizOptions';
 
-const PlayQuestionCard = ({ question, playerid, quizEnd, questionEnd, setQuestionEnd }) => {
+const PlayQuestionCard = ({ question, playerid, questionEnd, setQuestionEnd }) => {
   const [correct, setCorrect] = useState([]);
 
   // Fetch Correct Answer from backend
@@ -37,7 +37,7 @@ const PlayQuestionCard = ({ question, playerid, quizEnd, questionEnd, setQuestio
 
   return (
     <>
-      { ((!quizEnd && question) || console.log(question)) &&
+      { question &&
         <>
           <h5>Question: </h5><p>{question.question}</p>
           <p>Points: {question.points}</p>
@@ -81,9 +81,6 @@ const PlayQuestionCard = ({ question, playerid, quizEnd, questionEnd, setQuestio
           }
         </>
       }
-      { quizEnd &&
-        <div>Quiz ended</div>
-      }
     </>
   )
 }
@@ -91,7 +88,6 @@ const PlayQuestionCard = ({ question, playerid, quizEnd, questionEnd, setQuestio
 PlayQuestionCard.propTypes = {
   question: PropTypes.object.isRequired,
   playerid: PropTypes.number.isRequired,
-  quizEnd: PropTypes.bool.isRequired,
   questionEnd: PropTypes.bool.isRequired,
   setQuestionEnd: PropTypes.func.isRequired,
 }

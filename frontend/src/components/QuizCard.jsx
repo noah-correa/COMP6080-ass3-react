@@ -36,7 +36,7 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
 
   // Set sessionid
   useEffect(() => {
-    if (quiz) setSessionId(quiz.active);
+    if (quiz.active) setSessionId(quiz.active);
   }, [quiz]);
 
   // Fetch questions from backend
@@ -133,7 +133,7 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
   // View Results Button
   const handleViewResults = async (event) => {
     event.preventDefault();
-    navigate(`/quiz/play/${sessionId}/results`, { state: { sessionid: sessionId } });
+    navigate(`/quiz/results/${sessionId}`);
   }
 
   // Create session url

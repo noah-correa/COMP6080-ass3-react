@@ -30,9 +30,9 @@ const Router = () => {
           <Route path=':sessionid' element={<SessionJoin/>}/>
         </Route>
         <Route path='play' element={<Outlet/>}>
-          <Route path=':sessionid' element={<SessionPlay/>}/>
-          <Route path=':sessionid/results' element={<PrivateRoute><SessionResults/></PrivateRoute>}/>
+          <Route index path=':sessionid' element={<SessionPlay/>}/>
         </Route>
+        <Route path='results/:sessionid' element={<PrivateRoute><SessionResults/></PrivateRoute>}/>
       </Route>
     </Routes>
   );
