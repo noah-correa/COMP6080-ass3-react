@@ -8,7 +8,7 @@ export const PageContent = styled.main`
   flex-direction: column;
   align-items: center;
   & > * {
-    width: 80%;
+    width: 85%;
   };
   & > *:first-child {
     margin-top: 1rem;

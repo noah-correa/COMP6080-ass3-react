@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Spinner } from 'react-bootstrap';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 const LoadingWrapper = styled.div`
   width: 100%;
@@ -10,31 +11,16 @@ const LoadingWrapper = styled.div`
   align-items: center;
 `;
 
-const Info = styled.i`
-  color: lightgrey;
-`;
-
-const Loading = () => {
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setError(true);
-      console.error('An error occured loading content');
-    }, 10000);
-    return () => {
-      clearTimeout(timeout);
-    }
-  }, []);
-
+const Loading = (variant) => {
   return (
     <LoadingWrapper>
-      { error
-        ? <Info>Something went wrong, please try again later.</Info>
-        : <Spinner animation='border' variant="light"></Spinner>
-      }
+      <Spinner animation='border' variant={variant || 'light'}></Spinner>
     </LoadingWrapper>
   );
+}
+
+Loading.propTypes = {
+  variant: PropTypes.string,
 }
 
 export default Loading;

@@ -8,8 +8,7 @@ export const useAuth = () => {
 }
 
 export const ProvideAuth = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('bb_token') || '');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [token, setToken] = useState(() => localStorage.getItem('bb_token') || null);
   const [title, setTitle] = useState('BigBrain');
 
   // Update app title
@@ -53,8 +52,6 @@ export const ProvideAuth = ({ children }) => {
     login,
     logout,
     setTitle,
-    sidebarOpen,
-    setSidebarOpen,
   };
 
   return (

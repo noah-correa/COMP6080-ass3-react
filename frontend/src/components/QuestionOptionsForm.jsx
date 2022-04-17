@@ -10,49 +10,55 @@ import PropTypes from 'prop-types';
 //  border: 1px dashed grey;
 // `;
 
-const QuestionAnswersForm = ({ questionType, setAnswersList, setAnswer, answersList, answer }) => {
-  const [answers, setAnswers] = useState(['', '', '', '', '', '']);
-  const [valid, setValid] = useState([false, false, false, false, false, false]);
+const QuestionOptionsForm = ({ questionType, setOptions, setCorrect, options, correct }) => {
+  const [formOptions, setFormOptions] = useState(['', '', '', '', '', '']);
+  const [formCorrect, setFormCorrect] = useState([]);
 
-  // Update intermediate answers list
+  // Update intermediate answers list from parent
   useEffect(() => {
-    const newAnswers = answersList.concat(Array(6).fill('')).slice(0, 6);
-    setAnswers(newAnswers);
-  }, [answersList]);
+    const newOptions = options.concat(Array(6).fill('')).slice(0, 6);
+    setFormOptions(newOptions);
+  }, [options]);
 
-  // Update intermediate correct answer list
+  // Update intermediate correct answer list from parent
   useEffect(() => {
-    const newValid = answer.concat(Array(6).fill(false)).slice(0, 6);
-    setValid(newValid);
-  }, [answer]);
+    setFormCorrect(correct);
+  }, [correct]);
 
   // Update Parent answers list
   useEffect(() => {
-    setAnswersList(answers);
-  }, [answers]);
+    setOptions(formOptions);
+  }, [formOptions]);
 
   // Update Parent correct answer list
   useEffect(() => {
-    setAnswer(valid);
-  }, [valid]);
+    setCorrect(formCorrect);
+  }, [formCorrect]);
 
   // Answer updated handler
-  const handleAnswerUpdated = (event, idx) => {
-    setAnswers(prev => {
+  const handleOptionsUpdated = (event, idx) => {
+    setFormOptions(prev => {
       const newAns = [...prev];
       newAns[idx] = event.target.value;
       return newAns;
     });
   }
 
-  const handleValidUpdated = (event, idx) => {
+  const handleCorrectUpdated = (event, idx) => {
     if (questionType === 'single') {
-      const newValid = new Array(6).fill(false);
-      newValid[idx] = true;
-      setValid(newValid);
+      setFormCorrect(prev => {
+        if (!prev.includes(idx)) return [idx];
+      });
     } else if (questionType === 'multiple') {
-      const newValid = valid.map((val, index) => index === idx ? !val : val);
-      setValid(newValid);
+      setFormCorrect(prev => {
+        if (prev.includes(idx)) {
+          return [...prev].filter(i => i !== idx);
+        } else {
+          const n = [...prev];
+          n.push(idx);
+          return n;
+        }
+      });
     }
   }
 
@@ -78,29 +84,29 @@ const QuestionAnswersForm = ({ questionType, setAnswersList, setAnswer, answersL
   return (
     <Container fluid>
       <Row className='row-cols-2 row-cols-lg-6 g-2'>
-        { answers.map((ans, idx) => (
+        { formOptions.map((ans, idx) => (
           <Col key={idx}>
             <InputGroup>
               <Form.Control
                 as='textarea'
                 name={idx}
-                isValid={valid[idx]}
+                isValid={formCorrect.includes(idx)}
                 placeholder={`Answer ${idx + 1}${idx <= 1 ? '' : ' (optional)'}`}
-                onChange={(e) => handleAnswerUpdated(e, idx)}
+                onChange={(e) => handleOptionsUpdated(e, idx)}
                 value={ans}
               ></Form.Control>
               { questionType === 'single'
                 ? <InputGroup.Radio
                     name='answerChoice'
-                    onChange={(e) => handleValidUpdated(e, idx)}
-                    checked={valid[idx]}
-                    disabled={!answers[idx] && idx > 1}
+                    onChange={(e) => handleCorrectUpdated(e, idx)}
+                    checked={formCorrect.includes(idx)}
+                    disabled={!formOptions[idx] && idx > 1}
                   ></InputGroup.Radio>
                 : <InputGroup.Checkbox
                     name='answerChoices'
-                    onChange={(e) => handleValidUpdated(e, idx)}
-                    checked={valid[idx]}
-                    disabled={!answers[idx] && idx > 1}
+                    onChange={(e) => handleCorrectUpdated(e, idx)}
+                    checked={formCorrect.includes(idx)}
+                    disabled={!formOptions[idx] && idx > 1}
                   ></InputGroup.Checkbox>
               }
               {/* { idx > 1 &&
@@ -119,12 +125,12 @@ const QuestionAnswersForm = ({ questionType, setAnswersList, setAnswer, answersL
   )
 }
 
-QuestionAnswersForm.propTypes = {
+QuestionOptionsForm.propTypes = {
   questionType: PropTypes.string.isRequired,
-  setAnswersList: PropTypes.func.isRequired,
-  setAnswer: PropTypes.func.isRequired,
-  answersList: PropTypes.array.isRequired,
-  answer: PropTypes.array.isRequired,
+  setOptions: PropTypes.func.isRequired,
+  setCorrect: PropTypes.func.isRequired,
+  options: PropTypes.array.isRequired,
+  correct: PropTypes.array.isRequired,
 }
 
-export default QuestionAnswersForm;
+export default QuestionOptionsForm;

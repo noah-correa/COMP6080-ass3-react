@@ -8,7 +8,7 @@ import API from '../../utils/API';
 import { fileToDataUrl, youtubeUrlEmbed } from '../../utils/utils';
 
 // Components
-import QuestionAnswersForm from '../../components/QuestionAnswersForm';
+import QuestionOptionsForm from '../../components/QuestionOptionsForm';
 import Loading from '../../components/Loading';
 import ContentWrapper from '../../components/ContentWrapper';
 
@@ -22,8 +22,8 @@ const QuizQuestionEdit = () => {
   const [error, setError] = useState('');
   const [media, setMedia] = useState({ type: 'url', content: '' });
   const [questionCopy, setQuestionCopy] = useState(question);
-  const [answers, setAnswers] = useState(questionCopy.answers);
-  const [answer, setAnswer] = useState(questionCopy.answer);
+  const [options, setOptions] = useState(questionCopy.options);
+  const [correct, setCorrect] = useState(questionCopy.correct);
   const [fileInvalid, setFileInvalid] = useState(false);
 
   // Update App Title
@@ -70,22 +70,22 @@ const QuizQuestionEdit = () => {
         body.media.content = url;
       } else body.media.content = '';
     }
-    const numAnswers = answers.reduce((sum, curr) => sum + !!curr, 0);
-    const numAnswer = answer.reduce((sum, curr) => sum + !!curr, 0);
-    if (numAnswers < 2) {
+    const numOptions = options.reduce((sum, curr) => sum + !!curr, 0);
+    const numCorrect = correct.length;
+    if (numOptions < 2) {
       setError('Not enough answers created');
       return;
     } else {
-      body.answers = answers.slice(0, numAnswers);
+      body.options = options.slice(0, numOptions);
     }
-    if (questionCopy.type === 'single' && numAnswer !== 1) {
-      setError('Invalid number of correct answers');
+    if (questionCopy.type === 'single' && numCorrect !== 1) {
+      setError('Invalid number of correct answers for single choice');
       return;
-    } else if (questionCopy.type === 'multiple' && (numAnswer < 1 || numAnswer > numAnswers)) {
-      setError('Invalid number of correct answers');
+    } else if (questionCopy.type === 'multiple' && (numCorrect < 1 || numCorrect > numOptions)) {
+      setError('Invalid number of correct answers for multiple choice');
       return;
     } else {
-      body.answer = answer.slice(0, numAnswers);
+      body.correct = correct.slice(0, numOptions);
     }
     const updated = await updateQuizQuestion(state.quiz, body);
     if (updated) navigate(`/quiz/edit/${quizid}`);
@@ -269,12 +269,12 @@ const QuizQuestionEdit = () => {
               {/* Answers Input */}
               <Form.Group>
                 <Form.Label>Answers:</Form.Label><br/>
-                <QuestionAnswersForm
+                <QuestionOptionsForm
                   questionType={questionCopy.type}
-                  setAnswersList={setAnswers}
-                  setAnswer={setAnswer}
-                  answersList={questionCopy.answers}
-                  answer={questionCopy.answer}
+                  setOptions={setOptions}
+                  setCorrect={setCorrect}
+                  options={questionCopy.options}
+                  correct={questionCopy.correct}
                 />
               </Form.Group>
             </Form>

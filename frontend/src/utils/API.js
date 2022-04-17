@@ -3,7 +3,7 @@ import { BACKEND_PORT } from '../config.json';
 
 const BASE = `http://localhost:${BACKEND_PORT}`
 
-const buildRequest = (method, token, body = {}) => {
+const buildRequest = (method, token = undefined, body = {}) => {
   const req = {
     method: method,
     headers: { 'Content-Type': 'application/json' }
@@ -74,13 +74,43 @@ const API = {
     return await (await apiCall(`/admin/quiz/${quizid}/end`, 'POST', token)).json();
   },
 
-  sessionStatus: async (token, sessionid) => {
+  adminStatus: async (token, sessionid) => {
     return await (await apiCall(`/admin/session/${sessionid}/status`, 'GET', token)).json();
   },
 
   sessionResults: async (token, sessionid) => {
     return await (await apiCall(`/admin/session/${sessionid}/results`, 'GET', token)).json();
   },
+
+  playerJoin: async (sessionid, name) => {
+    const body = {
+      name,
+    };
+    return await (await apiCall(`/play/join/${sessionid}`, 'POST', undefined, body)).json();
+  },
+
+  playerStatus: async (playerid) => {
+    return await (await apiCall(`/play/${playerid}/status`, 'GET')).json();
+  },
+
+  getPlayerQuestion: async (playerid) => {
+    return await (await apiCall(`/play/${playerid}/question`, 'GET')).json();
+  },
+
+  getCorrectAnswer: async (playerid) => {
+    return await (await apiCall(`/play/${playerid}/answer`, 'GET')).json();
+  },
+
+  submitAnswer: async (playerid, answerIds) => {
+    const body = {
+      answerIds,
+    };
+    return await (await apiCall(`/play/${playerid}/answer`, 'PUT', undefined, body)).json();
+  },
+
+  getPlayerResults: async (playerid) => {
+    return await (await apiCall(`/play/${playerid}/results`, 'GET')).json();
+  }
 }
 
 export default API;

@@ -48,7 +48,7 @@ const useQuizFetch = (token, quizid) => {
   };
 
   useEffect(() => {
-    fetchQuiz(token, quizid);
+    if (token && quizid) fetchQuiz(token, quizid);
   }, [token, quizid]);
 
   return { quiz, quizLoading, quizError, fetchQuiz };

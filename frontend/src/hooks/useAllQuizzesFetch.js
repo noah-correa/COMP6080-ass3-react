@@ -20,7 +20,7 @@ const useAllQuizzesFetch = (token) => {
   };
 
   useEffect(() => {
-    fetchAllQuizzes(token);
+    if (token) fetchAllQuizzes(token);
   }, [token]);
 
   return { quizzes, quizzesLoading, quizzesError, fetchAllQuizzes };

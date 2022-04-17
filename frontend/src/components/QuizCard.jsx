@@ -5,9 +5,11 @@ import API from '../utils/API';
 import { useAuth } from '../utils/Auth';
 import { Link, useNavigate } from 'react-router-dom';
 import useQuizFetch from '../hooks/useQuizFetch';
+import useAdminStatus from '../hooks/useAdminStatus';
 import Loading from './Loading';
+import CountdownTimer from './CountdownTimer';
 
-const QuizCard = ({ empty, quizid }) => {
+const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
   const { token } = useAuth();
   const navigate = useNavigate();
   const { quiz, quizLoading, fetchQuiz } = useQuizFetch(token, quizid);
@@ -18,6 +20,8 @@ const QuizCard = ({ empty, quizid }) => {
   const [showStartPopup, setShowStartPopup] = useState(false);
   const [showStopPopup, setShowStopPopup] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const { adminStatus, fetchAdminStatus } = useAdminStatus(token, sessionId);
+  const [questionInProgress, setQuestionInProgress] = useState(false);
 
   // Empty Quiz Card
   if (empty) {
@@ -29,6 +33,11 @@ const QuizCard = ({ empty, quizid }) => {
       </Card>
     );
   }
+
+  // Set sessionid
+  useEffect(() => {
+    if (quiz) setSessionId(quiz.active);
+  }, [quiz]);
 
   // Fetch questions from backend
   useEffect(async () => {
@@ -49,11 +58,7 @@ const QuizCard = ({ empty, quizid }) => {
   // Calculate questions duration
   useEffect(() => {
     if (questions) {
-      let time = 0;
-      questions.forEach((question) => {
-        time += question.duration;
-      });
-      setDuration(time);
+      setDuration(questions.reduce((sum, question) => sum + question.duration, 0));
     }
   }, [questions]);
 
@@ -68,16 +73,17 @@ const QuizCard = ({ empty, quizid }) => {
     event.preventDefault();
     setLoading(true);
     const data = await API.deleteQuiz(token, quizid);
+    setLoading(false);
     if (data.error) {
       setError('Could not delete quiz');
+      console.log(data.error);
     } else {
-      fetchQuiz(token, quizid);
+      fetchAllQuizzes(token);
     }
-    setLoading(false);
   }
 
   // Start game handler
-  const handleStart = async (event, quizid) => {
+  const handleStart = async (event) => {
     event.preventDefault();
     setLoading(true);
     const data = await API.startGame(token, quizid);
@@ -90,29 +96,49 @@ const QuizCard = ({ empty, quizid }) => {
     setLoading(false);
   }
 
-  // Stop game handler
-  const handleStop = async (event, quizid) => {
+  // Advance game handler
+  const handleAdvance = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setSessionId(quiz.active);
+    if (adminStatus.position === adminStatus.questions.length - 1) {
+      await handleStop(event);
+    } else {
+      const data = await API.advanceGame(token, quizid);
+      if (data.error) {
+        console.error(data.error);
+      } else {
+        fetchQuiz(token, quizid);
+        fetchAdminStatus(token, sessionId);
+        setQuestionInProgress(true);
+      }
+      setLoading(false);
+    }
+  }
+
+  // Stop game handler
+  const handleStop = async (event) => {
+    event.preventDefault();
+    setLoading(true);
     const data = await API.endGame(token, quizid);
     if (data.error) {
       console.error(data.error);
     } else {
       fetchQuiz(token, quizid);
       setShowStopPopup(true);
+      setQuestionInProgress(false);
     }
     setLoading(false);
   }
 
-  // Create session url
-  const generateSessionUrl = (sessionid) => {
-    return window.location.href.replace('dashboard', `quiz/play/${sessionid}`);
-  }
-
+  // View Results Button
   const handleViewResults = async (event) => {
     event.preventDefault();
     navigate(`/quiz/play/${sessionId}/results`, { state: { sessionid: sessionId } });
+  }
+
+  // Create session url
+  const generateSessionUrl = (sessionid) => {
+    return window.location.href.replace('dashboard', `quiz/join/${sessionid}`);
   }
 
   if (loading || quizLoading) return <Loading/>;
@@ -124,17 +150,38 @@ const QuizCard = ({ empty, quizid }) => {
           { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
           <h4>{quiz.name}</h4>
           <p>Id: {quizid}</p>
-          <p>Created: {quiz.createdAt}</p>
+          <p>Created: {new Date(quiz.createdAt).toLocaleString()}</p>
           <Image thumbnail src={quiz.thumbnail} alt='No image' width='100px' height='100px'/>
           <p>Owner: {quiz.owner}</p>
           <p>Total Duration: {duration} seconds</p>
           <p>{ questions.length } question{ questions.length === 1 ? '' : 's' }</p>
-          { quiz.active && <p>Active Room: <Link to={`/quiz/play/${quiz.active}`} target='_blank'>{quiz.active}</Link></p> }
-          <Button variant='primary' onClick={handleEdit}>Edit</Button>
-          <Button variant='danger' onClick={handleDelete}>Delete</Button>
-          { quiz.active
-            ? <Button variant='warning' onClick={(e) => handleStop(e, quizid)}>Stop</Button>
-            : <Button variant='success' onClick={(e) => handleStart(e, quizid)}>Start</Button>
+          { quiz.active && <p>Active Room: <Link to={`/quiz/join/${quiz.active}`} target='_blank'>{quiz.active}</Link></p> }
+          { quiz.active && <p>{adminStatus.players.length} player{adminStatus.players.length === 1 ? '' : 's'}</p> }
+          { quiz.active && <p>Current Status: {adminStatus.position === -1 ? 'Lobby' : `Question ${adminStatus.position + 1} of ${adminStatus.questions.length}`}</p> }
+          { quiz.active && adminStatus.position !== -1 &&
+            <CountdownTimer
+              // start={adminStatus.isoTimeLastQuestionStarted}
+              // duration={adminStatus.questions[adminStatus.position].duration}
+              timer={{
+                start: adminStatus.isoTimeLastQuestionStarted,
+                duration: adminStatus.questions[adminStatus.position].duration
+              }}
+              onEnd={() => setQuestionInProgress(false)}
+            />
+          }
+          { !quiz.active && <Button variant='success' onClick={handleStart}>Start</Button> }
+          { quiz.active &&
+            <>
+              <Button variant='warning' onClick={handleAdvance} disabled={questionInProgress}>Advance</Button>
+              <Button variant='danger' onClick={handleStop}>Stop</Button>
+            </>
+          }
+          { !quiz.active &&
+            <>
+              <br/>
+              <Button variant='primary' onClick={handleEdit}>Edit</Button>
+              <Button variant='danger' onClick={handleDelete}>Delete</Button>
+            </>
           }
         </Card.Body>
       </Card>
@@ -143,7 +190,7 @@ const QuizCard = ({ empty, quizid }) => {
             <Modal.Title>New Session Started</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>Open session in new tab: <Link to={`/quiz/play/${quiz.active}`} target='_blank'>{quiz.active || ''}</Link></p>
+            <p>Open session in new tab: <Link to={`/quiz/join/${quiz.active}`} target='_blank'>{quiz.active || ''}</Link></p>
             { quiz.active && <Button variant='primary' onClick={() => navigator.clipboard.writeText(generateSessionUrl(quiz.active))}>Copy Session Link</Button> }
           </Modal.Body>
       </Modal>
@@ -164,6 +211,7 @@ const QuizCard = ({ empty, quizid }) => {
 QuizCard.propTypes = {
   empty: PropTypes.bool,
   quizid: PropTypes.number,
+  fetchAllQuizzes: PropTypes.func,
 }
 
 export default QuizCard;

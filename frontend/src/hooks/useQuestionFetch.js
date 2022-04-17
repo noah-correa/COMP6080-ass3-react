@@ -12,8 +12,8 @@ const defaultQuestion = {
     type: 'url',
     content: '',
   },
-  answers: [],
-  answer: [],
+  options: [],
+  correct: [],
 }
 
 const useQuestionFetch = (token, quizid, questionid) => {
@@ -39,7 +39,7 @@ const useQuestionFetch = (token, quizid, questionid) => {
   };
 
   useEffect(() => {
-    fetchQuestion(token, quizid, questionid);
+    if (token && quizid && questionid) fetchQuestion(token, quizid, questionid);
   }, [token, quizid, questionid]);
 
   return { question, questionLoading, questionError, fetchQuestion };

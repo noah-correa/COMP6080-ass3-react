@@ -35,8 +35,8 @@ const Dashboard = () => {
       } else {
         setError('');
         setSuccess(true);
-        createQuizNameRef.current.value = '';
-        fetchAllQuizzes(token);
+        createQuizNameRef.current = '';
+        await fetchAllQuizzes(token);
       }
       setLoading(false);
     }
@@ -71,12 +71,11 @@ const Dashboard = () => {
         </Card.Body>
       </Card>
       { (error || quizzesError) && <Alert dismissible variant='danger' onClose={() => setError('')}>{error || quizzesError}</Alert>}
-      {
-        quizzes.length === 0
-          ? (<QuizCard empty/>)
-          : (quizzes.map((quiz, index) => (
-              <QuizCard quizid={quiz.id} key={index}/>
-            )))
+      { quizzes.length === 0
+        ? (<QuizCard empty/>)
+        : (quizzes.map((quiz, index) => (
+            <QuizCard quizid={quiz.id} key={index} fetchAllQuizzes={fetchAllQuizzes}/>
+          )))
       }
     </ContentWrapper>
   )
