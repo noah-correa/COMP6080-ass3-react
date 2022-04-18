@@ -23,17 +23,21 @@ const PlayResults = ({ results, questions }) => {
 
   return (
     <ListGroup as='ol' numbered>
-      <ListGroup.Item className='text-center fw-bold'>Total Points: {questions.reduce((sum, q, i) => sum + (results[i].correct ? q.points : 0), 0)}</ListGroup.Item>
-      { questions && results && results.map((result, idx) => (
-        <ListGroup.Item as='li' className='d-flex justify-content-between align-items-start' key={idx}>
-        <div className="ms-2 me-auto">
-          <div className="fw-bold">{questions[idx].question}</div>
-        </div>
-        <div>
-          {questions[idx].points} pts {result.correct ? <CorrectIcon size='1.5rem'/> : <IncorrectIcon size='1.5rem'/>}
-        </div>
-        </ListGroup.Item>
-      ))}
+      { questions.length !== 0 && results.length !== 0 &&
+        <>
+          <ListGroup.Item className='text-center fw-bold'>Total Points: {questions.reduce((sum, q, i) => sum + (results[i] && results[i].correct ? q.points : 0), 0)}</ListGroup.Item>
+          { results.map((result, idx) => (
+            <ListGroup.Item as='li' className='d-flex justify-content-between align-items-start' key={idx}>
+            <div className="ms-2 me-auto">
+              <div className="fw-bold">{questions[idx].question}</div>
+            </div>
+            <div>
+              {questions[idx].points} pts {result.correct ? <CorrectIcon size='1.5rem'/> : <IncorrectIcon size='1.5rem'/>}
+            </div>
+            </ListGroup.Item>
+          ))}
+        </>
+      }
     </ListGroup>
   )
 }

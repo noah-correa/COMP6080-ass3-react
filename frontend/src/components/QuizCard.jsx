@@ -12,15 +12,15 @@ import CountdownTimer from './CountdownTimer';
 const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
   const { token } = useAuth();
   const navigate = useNavigate();
+  const [sessionId, setSessionId] = useState(null);
   const { quiz, quizLoading, fetchQuiz } = useQuizFetch(token, quizid);
+  const { adminStatus, fetchAdminStatus } = useAdminStatus(token, sessionId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [questions, setQuestions] = useState([]);
   const [duration, setDuration] = useState(0);
   const [showStartPopup, setShowStartPopup] = useState(false);
   const [showStopPopup, setShowStopPopup] = useState(false);
-  const [sessionId, setSessionId] = useState(null);
-  const { adminStatus, fetchAdminStatus } = useAdminStatus(token, sessionId);
   const [questionInProgress, setQuestionInProgress] = useState(false);
 
   // Empty Quiz Card
