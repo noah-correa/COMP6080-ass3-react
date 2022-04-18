@@ -7,11 +7,6 @@ import { useAuth } from '../../utils/Auth';
 import useAdminStatus from '../../hooks/useAdminStatus';
 import { BarChart, Cell, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 
-const calculateTimeDiff = (start, end) => {
-  const elapsed = +new Date(end) - +new Date(start);
-  return +parseFloat(elapsed / 1000).toFixed(1);
-}
-
 const SessionResults = () => {
   const { sessionid } = useParams();
   const { token } = useAuth();
@@ -110,6 +105,12 @@ const SessionResults = () => {
   const handleQuestionBreakdownSelected = (event) => {
     setDataCSelected(+event);
     loadQuestionBreakdown(+event, questions, results);
+  }
+
+  // Calculate seconds between two times
+  const calculateTimeDiff = (start, end) => {
+    const elapsed = +new Date(end) - +new Date(start);
+    return +parseFloat(elapsed / 1000).toFixed(1);
   }
 
   return (
