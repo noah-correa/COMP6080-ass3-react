@@ -23,7 +23,7 @@ export const quizQuestionGetCorrectAnswers = question => {
  all of the answers, correct or incorrect.
 */
 export const quizQuestionGetAnswers = question => {
-  return question.correct;
+  return [...Array(question.options.length).keys()];
 };
 
 /*

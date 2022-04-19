@@ -42,6 +42,12 @@ const Dashboard = () => {
     }
   }
 
+  // Create Quiz Success Timeout
+  useEffect(() => {
+    const timeout = setTimeout(() => setSuccess(false), 5000)
+    return () => clearTimeout(timeout);
+  }, [success]);
+
   if (loading || quizzesLoading) return <Loading/>;
 
   return (
@@ -58,14 +64,9 @@ const Dashboard = () => {
               <Collapse in={showCreateQuiz}>
                 <div>
                   <InputGroup className='mb-2'>
-                    <FormControl placeholder='Enter quiz name' ref={createQuizNameRef}></FormControl>
+                    <FormControl isValid={success} placeholder='Enter quiz name' ref={createQuizNameRef}></FormControl>
                     <Button variant='outline-primary' onClick={handleCreateQuiz}>Create</Button>
                   </InputGroup>
-                  { success &&
-                    <Alert dismissible variant='success' onClose={() => { setSuccess(false) }}>
-                      Quiz created!
-                    </Alert>
-                  }
                 </div>
               </Collapse>
         </Card.Body>

@@ -71,6 +71,10 @@ const PlayQuestionCard = ({ question, playerid, questionEnd, setQuestionEnd }) =
               ></iframe>
             </Ratio>
           }
+          { question.type === 'single'
+            ? <p>Select one correct answer</p>
+            : <p>Select all correct answer(s)</p>
+          }
           <QuizOptions
             questionType={question.type}
             options={question.options}

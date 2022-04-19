@@ -14,16 +14,26 @@ const HeaderWrapper = styled.header`
   position: sticky;
   top: 0;
   color: white;
-  padding-left: 15px;
+  padding-left: 10px;
 `;
 
-const HeaderButton = styled.h2`
+const HeaderTitleButton = styled.h2`
   cursor: pointer;
+`;
+
+const HeaderNavButton = styled.div`
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 4px 6px;
+  &:hover {
+    /* color: lightgrey; */
+    background-color: #46178f;
+  }
 `;
 
 const LogoutWrapper = styled.div`
   position: absolute;
-  right: 10px;
+  right: 5px;
 `;
 
 const Header = ({ auth }) => {
@@ -32,12 +42,23 @@ const Header = ({ auth }) => {
 
   const handleDashboard = (event) => {
     event.preventDefault();
+    if (!token) navigate('/login');
     navigate('/dashboard');
+  }
+
+  const handleJoinGame = (event) => {
+    event.preventDefault();
+    navigate('/quiz/join');
   }
 
   return (
     <HeaderWrapper className='shadow'>
-      <HeaderButton onClick={handleDashboard}>BigBrain</HeaderButton>
+      <div className='d-flex align-items-center'>
+        <HeaderTitleButton onClick={handleDashboard}>BigBrain</HeaderTitleButton>
+        <div className='ms-3'>
+          <HeaderNavButton onClick={handleJoinGame}>Join Game</HeaderNavButton>
+        </div>
+      </div>
       { token && <LogoutWrapper><Logout token={token} logout={logout}/></LogoutWrapper>}
     </HeaderWrapper>
   )

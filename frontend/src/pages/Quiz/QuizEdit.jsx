@@ -120,7 +120,7 @@ const QuizEdit = () => {
       <Card className='shadow'>
         <Card.Body>
           <div className='d-grid gap-2'>
-            <Button variant='primary' onClick={handleNewQuestion}>Add new question</Button>
+            <Button variant='primary' onClick={handleNewQuestion} className='mx-auto mb-2 mw-50'>Add new question</Button>
           </div>
           <ListGroup>
             { quiz &&
