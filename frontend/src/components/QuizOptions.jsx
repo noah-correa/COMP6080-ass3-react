@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import styled from 'styled-components';
 import Loading from '../components/Loading';
+import OptionButton from '../components/OptionButton';
 
-const OptionsContainer = styled(Container)`
+export const OptionsContainer = styled(Container)`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 5px 5px;
-`;
-
-const OptionButton = styled(Button)`
-  min-width: 45%;
-  height: 10%;
-  flex: 1;
 `;
 
 const QuizOptions = ({ questionType, options, updateSelected, disabled, correct }) => {
@@ -49,13 +44,6 @@ const QuizOptions = ({ questionType, options, updateSelected, disabled, correct 
     }
   }
 
-  const getButtonVariant = (idx, correct) => {
-    if (disabled && selected.includes(idx) && correct.includes(idx)) return 'success';
-    if (disabled && selected.includes(idx) && !correct.includes(idx)) return 'danger';
-    if (disabled && !selected.includes(idx) && correct.includes(idx)) return 'danger';
-    return 'outline-secondary';
-  }
-
   if (disabled && correct.length === 0) return <Loading variant='dark'/>
 
   return (
@@ -63,14 +51,15 @@ const QuizOptions = ({ questionType, options, updateSelected, disabled, correct 
       <OptionsContainer fluid>
         { options && options.map((option, idx) => (
           <OptionButton
-            variant={getButtonVariant(idx, correct)}
             key={idx}
-            onClick={(e) => handleChangeSelected(e, idx)}
-            active={selected && selected.includes(idx)}
-            type={questionType === 'single' ? 'radio' : 'checkbox'}
+            index={idx}
+            handleClick={(e) => handleChangeSelected(e, idx)}
+            selected={selected && selected.includes(idx)}
+            correct={correct && correct.includes(idx)}
+            questionType={questionType}
             disabled={disabled}
+            question={option}
           >
-            {option}
           </OptionButton>
         ))
         }

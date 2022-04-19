@@ -13,23 +13,8 @@ const CountdownTimer = ({ timer, onEnd }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [started, setStarted] = useState(false);
   const interval = useRef();
-  // const cb = useRef(() => {});
 
-  // const startCountdown = (start, duration) => {
-  //   cb.current = onEnd;
-  //   interval.current = setInterval(() => {
-  //     const t = calculateTimeLeft(start, duration);
-  //     setTimeLeft(t);
-  //     if (t === 0) {
-  //       console.log('TIMER: question ended');
-  //       clearInterval(interval.current);
-  //       cb.current();
-  //     }
-  //   }, 1000);
-
-  //   return () => clearInterval(interval.current);
-  // }
-
+  // Update time left with new time
   const updateTimeLeft = (start, duration) => {
     const t = calculateTimeLeft(start, duration);
     setTimeLeft(t);
@@ -38,6 +23,7 @@ const CountdownTimer = ({ timer, onEnd }) => {
     }
   }
 
+  // Start countdown Interval
   useEffect(() => {
     if (started) {
       interval.current = setInterval(() => {

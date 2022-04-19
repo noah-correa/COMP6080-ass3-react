@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Loading from './Loading';
-import { Image, Ratio } from 'react-bootstrap';
+import { Badge, Image, Ratio, Container, Row, Col } from 'react-bootstrap';
 import CountdownTimer from './CountdownTimer';
 import API from '../utils/API';
 import QuizOptions from './QuizOptions';
@@ -39,8 +39,14 @@ const PlayQuestionCard = ({ question, playerid, questionEnd, setQuestionEnd }) =
     <>
       { question &&
         <>
-          <h5>Question: </h5><p>{question.question}</p>
-          <p>Points: {question.points}</p>
+          <Container fluid className='m-0 p-0'>
+            <Row>
+              <Col></Col>
+              <Col className='text-center'><h5>{question.question}</h5></Col>
+              <Col className='text-end'><Badge pill>{question.points} points</Badge></Col>
+            </Row>
+          </Container>
+          <br/>
           <div>
             <CountdownTimer
               timer={{
@@ -51,7 +57,6 @@ const PlayQuestionCard = ({ question, playerid, questionEnd, setQuestionEnd }) =
             />
           </div>
           <br/>
-          { !question.media.content && <p>No media attached</p>}
           { question.media.content && question.media.type === 'file' &&
             <Image thumbnail src={question.media.content} alt='No image' width='100px' height='100px'/>
           }
@@ -74,10 +79,13 @@ const PlayQuestionCard = ({ question, playerid, questionEnd, setQuestionEnd }) =
             correct={correct || []}
           />
           { correct && questionEnd &&
-            <div>
-              <Loading variant='dark'/>
-              <p className='text-center'>Waiting for next question</p>
-            </div>
+            <>
+              <br/>
+              <div>
+                <Loading variant='dark'/>
+                <p className='text-center'>Waiting for next question</p>
+              </div>
+            </>
           }
         </>
       }

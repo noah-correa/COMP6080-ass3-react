@@ -9,6 +9,7 @@ export const PageContent = styled.main`
   align-items: center;
   & > * {
     width: 85%;
+    max-width: 900px;
   };
   & > *:first-child {
     margin-top: 1rem;
@@ -31,7 +32,8 @@ export const CenterPageContent = styled.main`
   align-items: center;
   justify-content: center;
   & > * {
-    width: 80%;
+    width: 85%;
+    max-width: 900px;
   };
 `;
 

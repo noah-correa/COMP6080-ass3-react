@@ -1,22 +1,6 @@
 import { Card } from 'react-bootstrap';
 import styled from 'styled-components';
-
-export const BodyWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    background-color: #46178f;
-    min-height: calc(100vh - 100px);
-`;
-
-export const FooterCard = styled.footer`
-    background-color: #25076b;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    height: 50px;
-`;
+import { HiOutlineCheckCircle, HiOutlineXCircle } from 'react-icons/hi';
 
 export const AuthCard = styled(Card)`
     width: 60%;
@@ -25,10 +9,14 @@ export const AuthCard = styled(Card)`
     text-align: center;
 `;
 
-export const CardHeading = styled.h1`
+export const CardSubHeading = styled.h4`
     text-align: center;
 `;
 
-export const CardSubHeading = styled.h4`
-    text-align: center;
+export const CorrectIcon = styled(HiOutlineCheckCircle)`
+  color: limegreen;
+`;
+
+export const IncorrectIcon = styled(HiOutlineXCircle)`
+  color: red;
 `;

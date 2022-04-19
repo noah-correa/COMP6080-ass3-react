@@ -116,7 +116,7 @@ const SessionResults = () => {
   return (
     <ContentWrapper>
       {/* Top 5 Table */}
-      <Card className='mt-3 shadow'>
+      <Card className='shadow'>
         <Card.Body>
           <Card.Title>Top Players</Card.Title>
           <Table responsive>
@@ -138,7 +138,7 @@ const SessionResults = () => {
         </Card.Body>
       </Card>
       {/* Percentage Correct Chart */}
-      <Card className='mt-2 shadow'>
+      <Card className='shadow'>
         <Card.Body>
         <Card.Title>Percentage Correct</Card.Title>
         <div style={{ display: 'flex', minwidth: '100%', height: '15rem' }}>
@@ -159,7 +159,7 @@ const SessionResults = () => {
         </div>
         </Card.Body>
       </Card>
-      <Card className='mt-2'>
+      <Card className='shadow'>
         <Card.Body>
         <Card.Title>Response Time</Card.Title>
         <div style={{ display: 'flex', minwidth: '100%', height: '10rem' }}>
@@ -181,7 +181,7 @@ const SessionResults = () => {
         </Card.Body>
       </Card>
       {/* Question Breakdown Chart */}
-      <Card className='mt-2 mb-3 shadow'>
+      <Card className='shadow'>
         <Card.Body>
         <Card.Title className='d-flex justify-content-between'>
           Question Responses Breakdown
@@ -191,7 +191,7 @@ const SessionResults = () => {
             ))}
           </DropdownButton>
         </Card.Title>
-        <Card.Subtitle className='text-center'>Question: {questions && questions[dataCSelected].question}</Card.Subtitle>
+        <Card.Subtitle className='text-center'>Question: {questions.length && questions[dataCSelected].question}</Card.Subtitle>
         <div style={{ display: 'flex', minwidth: '100%', height: '10rem' }}>
           <ResponsiveContainer>
             <BarChart

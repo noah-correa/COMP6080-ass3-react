@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../utils/Auth';
-
+import PropTypes from 'prop-types';
 import Logout from './Logout';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,9 +26,9 @@ const LogoutWrapper = styled.div`
   right: 10px;
 `;
 
-const Header = () => {
-  const { token } = useAuth();
+const Header = ({ auth }) => {
   const navigate = useNavigate();
+  const { token, logout } = auth;
 
   const handleDashboard = (event) => {
     event.preventDefault();
@@ -39,9 +38,13 @@ const Header = () => {
   return (
     <HeaderWrapper className='shadow'>
       <HeaderButton onClick={handleDashboard}>BigBrain</HeaderButton>
-      { token && <LogoutWrapper><Logout/></LogoutWrapper>}
+      { token && <LogoutWrapper><Logout token={token} logout={logout}/></LogoutWrapper>}
     </HeaderWrapper>
   )
+}
+
+Header.propTypes = {
+  auth: PropTypes.object.isRequired,
 }
 
 export default Header;

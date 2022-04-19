@@ -60,7 +60,7 @@ const Register = () => {
 
   return (
     <ContentWrapper center>
-      <AuthCard>
+      <AuthCard className='shadow'>
         <Card.Body>
           <CardSubHeading>Register</CardSubHeading>
           <Form noValidate onSubmit={handleRegister} validated={validated}>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Card, Image, Modal } from 'react-bootstrap';
+import { Button, Card, Image, Modal, Badge } from 'react-bootstrap';
 import API from '../utils/API';
 import { useAuth } from '../utils/Auth';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,7 +16,6 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
   const { quiz, quizLoading, fetchQuiz } = useQuizFetch(token, quizid);
   const { adminStatus, fetchAdminStatus } = useAdminStatus(token, sessionId);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [questions, setQuestions] = useState([]);
   const [duration, setDuration] = useState(0);
   const [showStartPopup, setShowStartPopup] = useState(false);
@@ -46,9 +45,7 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
       const data = await API.getQuiz(token, quizid);
       if (data.error) {
         console.error(data.error);
-        setError('Could not fetch quiz');
       } else {
-        setError('');
         setQuestions(data.questions);
       }
       setLoading(false);
@@ -75,7 +72,6 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
     const data = await API.deleteQuiz(token, quizid);
     setLoading(false);
     if (data.error) {
-      setError('Could not delete quiz');
       console.log(data.error);
     } else {
       fetchAllQuizzes(token);
@@ -147,21 +143,21 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
     <>
       <Card className='shadow'>
         <Card.Body>
-          { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
-          <h4>{quiz.name}</h4>
-          <p>Id: {quizid}</p>
+          <div className='d-flex align-items-center justify-content-between mb-1'>
+            <h4 className='mb-0'>{quiz.name}</h4>
+            <div>
+              <Badge pill>{ questions.length } question{ questions.length === 1 ? '' : 's' }</Badge>
+              <Badge pill bg='secondary' className='ms-2'>{duration} seconds</Badge>
+            </div>
+          </div>
           <p>Created: {new Date(quiz.createdAt).toLocaleString()}</p>
           <Image thumbnail src={quiz.thumbnail} alt='No image' width='100px' height='100px'/>
           <p>Owner: {quiz.owner}</p>
-          <p>Total Duration: {duration} seconds</p>
-          <p>{ questions.length } question{ questions.length === 1 ? '' : 's' }</p>
           { quiz.active && <p>Active Room: <Link to={`/quiz/join/${quiz.active}`} target='_blank'>{quiz.active}</Link></p> }
           { quiz.active && <p>{adminStatus.players.length} player{adminStatus.players.length === 1 ? '' : 's'}</p> }
           { quiz.active && <p>Current Status: {adminStatus.position === -1 ? 'Lobby' : `Question ${adminStatus.position + 1} of ${adminStatus.questions.length}`}</p> }
           { quiz.active && adminStatus.position !== -1 &&
             <CountdownTimer
-              // start={adminStatus.isoTimeLastQuestionStarted}
-              // duration={adminStatus.questions[adminStatus.position].duration}
               timer={{
                 start: adminStatus.isoTimeLastQuestionStarted,
                 duration: adminStatus.questions[adminStatus.position].duration

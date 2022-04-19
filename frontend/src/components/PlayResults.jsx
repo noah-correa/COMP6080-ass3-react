@@ -1,16 +1,7 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { ListGroup } from 'react-bootstrap';
-import { HiOutlineCheckCircle, HiOutlineXCircle } from 'react-icons/hi';
-
-const CorrectIcon = styled(HiOutlineCheckCircle)`
-  color: limegreen;
-`;
-
-const IncorrectIcon = styled(HiOutlineXCircle)`
-  color: red;
-`;
+import { CorrectIcon, IncorrectIcon } from '../styles/common';
 
 const PlayResults = ({ results, questions }) => {
   useEffect(() => {

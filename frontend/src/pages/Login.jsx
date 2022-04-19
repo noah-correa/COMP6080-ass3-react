@@ -54,7 +54,7 @@ const Login = () => {
 
   return (
     <ContentWrapper center>
-      <AuthCard>
+      <AuthCard className='shadow'>
         <Card.Body>
           <CardSubHeading>Login</CardSubHeading>
           { loginError && <Alert variant='danger' dismissible onClose={() => setLoginError('')}>{loginError}</Alert>}
