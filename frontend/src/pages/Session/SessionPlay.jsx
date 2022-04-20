@@ -6,8 +6,10 @@ import { AuthCard } from '../../styles/common';
 import PlayQuestionCard from '../../components/PlayQuestionCard';
 import API from '../../utils/API';
 import PlayResults from '../../components/PlayResults';
+import { useAuth } from '../../utils/Auth';
 
 const SessionPlay = () => {
+  const { setTitle } = useAuth();
   const { sessionid } = useParams();
   const { state } = useLocation();
   const playerid = state && state.playerid;
@@ -19,6 +21,11 @@ const SessionPlay = () => {
   const [quizEnd, setQuizEnd] = useState(false);
   const [allQuestions, setAllQuestions] = useState([]);
   const [results, setResults] = useState([]);
+
+  // Set App Title
+  useEffect(() => {
+    setTitle('Play Quiz');
+  }, []);
 
   // Check if player is logged in
   useEffect(() => {

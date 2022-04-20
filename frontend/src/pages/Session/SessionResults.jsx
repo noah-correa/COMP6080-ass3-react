@@ -9,7 +9,7 @@ import { BarChart, Cell, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveCo
 
 const SessionResults = () => {
   const { sessionid } = useParams();
-  const { token } = useAuth();
+  const { token, setTitle } = useAuth();
   const [results, setResults] = useState([]);
   const [questions, setQuestions] = useState([]);
   const { adminStatus } = useAdminStatus(token, sessionid);
@@ -21,6 +21,7 @@ const SessionResults = () => {
 
   // Load Results on mount
   useEffect(() => {
+    setTitle('Quiz Results');
     fetchResults(token, sessionid);
   }, []);
 

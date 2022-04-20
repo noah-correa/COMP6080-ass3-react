@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, InputGroup, Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-// import styled from 'styled-components';
-
-// const AddAnswerButton = styled(Button)`
-//  width: 100%;
-//  background-color: transparent;
-//  color: grey;
-//  border: 1px dashed grey;
-// `;
 
 const QuestionOptionsForm = ({ questionType, setOptions, setCorrect, options, correct }) => {
   const [formOptions, setFormOptions] = useState(['', '', '', '', '', '']);
@@ -62,25 +54,6 @@ const QuestionOptionsForm = ({ questionType, setOptions, setCorrect, options, co
     }
   }
 
-  // const handleAddAnswer = (event) => {
-  //   event.preventDefault();
-  //   setAnswers(prev => { console.log([...prev, '']); return [...prev, ''] });
-  // }
-
-  // const handleDeleteAnswer = (event) => {
-  //   event.preventDefault();
-  //   const idx = parseInt(event.currentTarget.id, 10) - 1;
-  //   setAnswers(prev => {
-  //     const n = prev;
-  //     const del = n.splice(idx, 1);
-  //     console.log(del);
-  //     console.log(prev);
-  //     console.log(idx);
-  //     console.log(n);
-  //     return n;
-  //   });
-  // }
-
   return (
     <Container fluid>
       <Row className='row-cols-2 row-cols-lg-6 g-2'>
@@ -94,6 +67,7 @@ const QuestionOptionsForm = ({ questionType, setOptions, setCorrect, options, co
                 placeholder={`Answer ${idx + 1}${idx <= 1 ? '' : ' (optional)'}`}
                 onChange={(e) => handleOptionsUpdated(e, idx)}
                 value={ans}
+                disabled={formOptions.filter((v) => v !== '').length < idx}
               ></Form.Control>
               { questionType === 'single'
                 ? <InputGroup.Radio
@@ -109,17 +83,9 @@ const QuestionOptionsForm = ({ questionType, setOptions, setCorrect, options, co
                     disabled={!formOptions[idx] && idx > 1}
                   ></InputGroup.Checkbox>
               }
-              {/* { idx > 1 &&
-                <Button id={idx} variant='outline-danger' onClick={handleDeleteAnswer}><i className="bi bi-x-lg"></i></Button>
-              } */}
             </InputGroup>
           </Col>
         ))}
-        {/* { answers.length < 6 &&
-          <Col>
-            <AddAnswerButton variant='outline-secondary' onClick={handleAddAnswer}>Add answer</AddAnswerButton>
-          </Col>
-        } */}
       </Row>
     </Container>
   )

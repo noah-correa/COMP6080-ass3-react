@@ -38,10 +38,10 @@ export const youtubeUrlEmbed = (url) => {
   if (embed > -1) return url;
   else {
     const watch = url.indexOf('watch?v=');
-    if (watch > -1) return `https://www.youtube.com/embed/${url.substring(watch + 8)}`;
+    if (watch > -1) return `https://www.youtube-nocookie.com/embed/${url.substring(watch + 8)}`;
     else {
       const short = url.indexOf('.be/');
-      if (short > -1) return `https://www.youtube.com/embed/${url.substring(short + 4)}`;
+      if (short > -1) return `https://www.youtube-nocookie.com/embed/${url.substring(short + 4)}`;
     }
   }
   return null;
@@ -54,4 +54,14 @@ export const generateId = (n = 5) => {
   while (ids.includes(id)) id = Math.floor(Math.random() * Math.pow(10, n));
   ids.push(id);
   return id;
+}
+
+// Format duration to string
+export const formatDuration = (duration) => {
+  const m = Math.floor(duration / 60);
+  const s = duration % 60;
+  if (m && s) return `${m}:${String(s).padStart(2, '0')} (min:sec)`;
+  if (m) return `${m}:00 (min:sec)`;
+  if (s) return `0:${String(s).padStart(2, '0')} (min:sec)`
+  return '0:00 (min:sec)';
 }

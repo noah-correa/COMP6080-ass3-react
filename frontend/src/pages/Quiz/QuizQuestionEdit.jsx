@@ -2,15 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../utils/Auth';
-import { Card, Button, Form, ButtonGroup, ToggleButton, Row, Col, Alert, Image, Ratio } from 'react-bootstrap';
+import { Card, Button, Form, ButtonGroup, ToggleButton, Alert, Image, Ratio } from 'react-bootstrap';
 import useQuestionFetch from '../../hooks/useQuestionFetch';
 import API from '../../utils/API';
 import { fileToDataUrl, youtubeUrlEmbed } from '../../utils/utils';
-
-// Components
+import styled from 'styled-components';
 import QuestionOptionsForm from '../../components/QuestionOptionsForm';
 import Loading from '../../components/Loading';
 import ContentWrapper from '../../components/ContentWrapper';
+
+const Divider = styled.hr`
+  color: grey;
+  /* background-color: #46178f; */
+  width: 100%;
+  height: 1;
+`;
 
 const QuizQuestionEdit = () => {
   const { quizid, questionid } = useParams();
@@ -112,10 +118,10 @@ const QuizQuestionEdit = () => {
       <Card className='shadow'>
         <Card.Body>
             { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
-            <Form>
+            <Form className='d-flex flex-column align-items-center'>
               {/* Question Input */}
-              <Form.Group>
-                <Form.Label>Question</Form.Label>
+              <Form.Group className='w-75'>
+                <Form.Label className='d-flex justify-content-center'><h6 className='m-0'>Question</h6></Form.Label>
                 <Form.Control
                   type='text'
                   as='textarea'
@@ -126,79 +132,58 @@ const QuizQuestionEdit = () => {
                   placeholder='Enter question'
                 ></Form.Control>
               </Form.Group>
-
-              {/* Question Type Buttons */}
-              <Form.Group>
-                <Form.Label>Question Type:</Form.Label><br/>
-                <ButtonGroup>
-                  <ToggleButton
-                    name='typeChoice'
-                    id='single'
-                    type='radio'
-                    onChange={(e) => setQuestionCopy(prev => {
-                      return { ...prev, type: 'single' }
-                    })}
-                    checked={questionCopy.type === 'single'}
-                  >
-                    Single Choice
-                  </ToggleButton>
-                  <ToggleButton
-                    name='typeChoice'
-                    id='multiple'
-                    type='radio'
-                    onChange={(e) => setQuestionCopy(prev => {
-                      return { ...prev, type: 'multiple' }
-                    })}
-                    checked={questionCopy.type === 'multiple'}
-                  >
-                    Multiple Choice
-                  </ToggleButton>
-                </ButtonGroup>
-              </Form.Group>
-
+              <Divider/>
               {/* Time Limit Input */}
-              <Form.Group>
-                <Form.Label>Time Limit:</Form.Label>
-                  {/* TODO: Make two sliders, one for minutes and seconds */}
-                  <Row>
-                    <Col>
-                      <Form.Range
-                        value={questionCopy.duration}
-                        onChange={(e) => setQuestionCopy(prev => {
-                          return { ...prev, duration: parseInt(e.target.value, 10) }
-                        })}
-                        min={5}
-                        max={5 * 60}
-                        step={5}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
+              <Form.Group className='d-flex w-75 gap-2 flex-column align-items-center'>
+                <Form.Label className='m-0'><h6 className='m-0'>Time Limit</h6></Form.Label>
+                  <Form.Range
+                    value={questionCopy.duration}
+                    onChange={(e) => setQuestionCopy(prev => {
+                      return { ...prev, duration: parseInt(e.target.value, 10) }
+                    })}
+                    min={5}
+                    max={5 * 60}
+                    step={5}
+                  />
+                  <div className='d-flex gap-2 align-items-center'>
+                    <div className='d-flex w-50 flex-column align-items-center'>
                       <Form.Control
                         type='number'
+                        min={0}
+                        max={5}
                         value={Math.floor(questionCopy.duration / 60)}
-                        readOnly
+                        onChange={(e) => setQuestionCopy(prev => {
+                          const t = parseInt(e.target.value, 10) * 60 + prev.duration % 60;
+                          if (t < 5) return { ...prev, duration: 5 };
+                          if (t > 5 * 60) return { ...prev, duration: 5 * 60 };
+                          return { ...prev, duration: t };
+                        })}
                       />
                       <Form.Label>minutes</Form.Label>
-                    </Col>
-                    <Col>
+                    </div>
+                    <div className='d-flex w-50 flex-column align-items-center'>
                       <Form.Control
                         type='number'
+                        min={0}
+                        max={59}
                         value={questionCopy.duration % 60}
-                        readOnly
+                        onChange={(e) => setQuestionCopy(prev => {
+                          const t = parseInt(e.target.value, 10) + Math.floor(prev.duration / 60) * 60;
+                          if (t < 5) return { ...prev, duration: 5 };
+                          return { ...prev, duration: t }
+                        })}
                       />
-                      <Form.Label>seconds</Form.Label>
-                    </Col>
-                  </Row>
+                      <Form.Label className='d-flex justify-content-center'>seconds</Form.Label>
+                    </div>
+                  </div>
               </Form.Group>
-
+              <Divider/>
               {/* Points Input */}
-              <Form.Group>
-                <Form.Label>Points:</Form.Label>
+              <Form.Group className='d-flex w-75 gap-2 flex-column align-items-center'>
+                <Form.Label className='m-0'><h6 className='m-0'>Points</h6></Form.Label>
                 <Form.Control
+                  className='w-25'
                   type='number'
-                  step={5}
                   min={0}
                   value={questionCopy.points}
                   onChange={(e) => setQuestionCopy(prev => {
@@ -206,38 +191,41 @@ const QuizQuestionEdit = () => {
                   })}
                 ></Form.Control>
               </Form.Group>
-
+              <Divider/>
               {/* Media Input */}
-              <Form.Group>
-                <Form.Label>Media:</Form.Label><br/>
-                <ButtonGroup>
-                  <ToggleButton
-                    name='mediaChoice'
-                    type='radio'
-                    onClick={() => setMedia({ type: 'url', content: '' })}
-                    checked={media.type === 'url'}
-                  >
-                    Youtube URL
-                  </ToggleButton>
-                  <ToggleButton
-                    name='mediaChoice'
-                    type='radio'
-                    onClick={() => setMedia({ type: 'file', content: '' })}
-                    checked={media.type === 'file'}
-                  >
-                    Image
-                  </ToggleButton>
-                </ButtonGroup>
-                <Button variant='outline-danger' onClick={() => setMedia({ type: media.type, content: '' })}>Remove Media</Button>
+              <Form.Group className='d-flex w-100 gap-2 flex-column align-items-center'>
+                <Form.Label className='m-0'><h6 className='m-0'>Media</h6></Form.Label>
+                <div className='d-flex w-100 align-items-center justify-content-between'>
+                  <ButtonGroup>
+                    <ToggleButton
+                      name='mediaChoice'
+                      type='radio'
+                      onClick={() => setMedia({ type: 'url', content: questionCopy.media.type === 'url' ? question.media.content : '' })}
+                      checked={media.type === 'url'}
+                    >
+                      Youtube URL
+                    </ToggleButton>
+                    <ToggleButton
+                      name='mediaChoice'
+                      type='radio'
+                      onClick={() => setMedia({ type: 'file', content: questionCopy.media.type === 'file' ? question.media.content : '' })}
+                      checked={media.type === 'file'}
+                    >
+                      Image
+                    </ToggleButton>
+                  </ButtonGroup>
+                  <Button variant='outline-danger' onClick={() => setMedia({ type: media.type, content: '' })}>Remove Media</Button>
+                </div>
                 <Form.Control
                   type={media.type}
                   onChange={handleMediaUpload}
                   placeholder={media.type === 'url' ? 'https://www.youtube.com/...' : ''}
-                  // value={media.type === 'url' ? media.content : ''}
                   isInvalid={media.type === 'file' && fileInvalid}
                 ></Form.Control>
                 { media.type === 'file' && media.content && questionCopy.media.type === 'file' && questionCopy.media.content !== '' &&
-                  <Image thumbnail src={media.content} width='100px' height='100px'></Image>
+                  <div className='w-75'>
+                    <Image fluid thumbnail src={media.content} height='100%'></Image>
+                  </div>
                 }
                 { media.type === 'url' && media.content && questionCopy.media.type === 'url' && questionCopy.media.content !== '' &&
                   <Ratio aspectRatio='16x9'>
@@ -250,25 +238,35 @@ const QuizQuestionEdit = () => {
                     ></iframe>
                   </Ratio>
                 }
-                {/* { media === 'url'
-                  ? (<Form.Control
-                      type='url'
-                      onChange={(e) => setQuestionCopy(prev => {
-                        return { ...prev, media: { ...prev.media, content: e.target.value } }
-                      })}
-                    ></Form.Control>)
-                  : (<Form.Control
-                      type='file'
-                      onChange={(e) => setQuestionCopy(prev => {
-                        return { ...prev, media: { ...prev.media, content: e.target.value } }
-                      })}
-                    ></Form.Control>)
-                } */}
               </Form.Group>
-
+              <Divider/>
               {/* Answers Input */}
-              <Form.Group>
-                <Form.Label>Answers:</Form.Label><br/>
+              <Form.Group className='d-flex gap-2 flex-column align-items-center'>
+                <Form.Label className='m-0'><h6 className='m-0'>Answers</h6></Form.Label>
+                <ButtonGroup>
+                  <ToggleButton
+                    name='typeChoice'
+                    id='single'
+                    type='radio'
+                    onChange={() => setQuestionCopy(prev => {
+                      return { ...prev, type: 'single' }
+                    })}
+                    checked={questionCopy.type === 'single'}
+                  >
+                    Single Choice
+                  </ToggleButton>
+                  <ToggleButton
+                    name='typeChoice'
+                    id='multiple'
+                    type='radio'
+                    onChange={() => setQuestionCopy(prev => {
+                      return { ...prev, type: 'multiple' }
+                    })}
+                    checked={questionCopy.type === 'multiple'}
+                  >
+                    Multiple Choice
+                  </ToggleButton>
+                </ButtonGroup>
                 <QuestionOptionsForm
                   questionType={questionCopy.type}
                   setOptions={setOptions}

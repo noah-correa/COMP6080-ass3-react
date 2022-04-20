@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Image, Ratio } from 'react-bootstrap';
+import { Button, Image, Ratio, Stack } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { BsCheckCircle, BsCheckSquare, BsStopwatch, BsStar } from 'react-icons/bs';
+import { formatDuration } from '../utils/utils';
 
 const QuestionCard = ({ quiz, question, updateQuiz }) => {
   const navigate = useNavigate();
-  const [error, setError] = useState('');
 
   // View Button Handler
   const handleEdit = async (event) => {
@@ -26,26 +27,37 @@ const QuestionCard = ({ quiz, question, updateQuiz }) => {
 
   return (
     <>
-      { error && <Alert variant='danger' dismissible onClose={() => setError('')}>{error}</Alert> }
-      <h5>Question {quiz.questions.indexOf(question) + 1}: </h5><p>{question.question}</p>
-      <p>Type: {question.type}</p>
-      { !question.media.content && <p>No media attached</p>}
-      { question.media.type === 'file' && question.media.content && <Image thumbnail src={question.media.content} alt='No image' width='100px' height='100px'/> }
-      { question.media.type === 'url' && question.media.content &&
-                  <Ratio aspectRatio='16x9'>
-                    <iframe
-                      title='Question Media'
-                      src={question.media.content}
-                      frameBorder="0"
-                      allow="accelerometer; clipboard-write; encrypted-media"
-                      allowFullScreen
-                    ></iframe>
-                  </Ratio>
-                }
-      <p>Points: {question.points}</p>
-      <p>Duration: {question.duration} seconds</p>
-      <Button variant='primary' onClick={handleEdit}>Edit</Button>
-      <Button variant='danger' onClick={handleDelete}>Delete</Button>
+      <h5>Q{quiz.questions.indexOf(question) + 1} - {question.question}</h5>
+      <div className='d-flex gap-2 align-items-center justify-content-between'>
+        <div>
+          <p>{question.type === 'single' ? <BsCheckCircle/> : <BsCheckSquare/>} {question.type.charAt(0).toUpperCase() + question.type.slice(1)} Choice</p>
+          <p><BsStar/> {question.points} points</p>
+          <p><BsStopwatch/> {formatDuration(question.duration)}</p>
+        </div>
+        { question.media.content &&
+          <div className='d-flex w-50 align-items-center justify-content-center'>
+            { (question.media.type === 'file' && question.media.content)
+              ? <div className='w-100'>
+                  <Image fluid thumbnail src={question.media.content} alt='No image' width='100%' height='100%'/>
+                </div>
+              : <Ratio aspectRatio='16x9'>
+                  <iframe
+                    title='Question Media'
+                    src={question.media.content}
+                    allow="accelerometer; clipboard-write; encrypted-media"
+                    allowFullScreen
+                  ></iframe>
+                </Ratio>
+            }
+          </div>
+        }
+        <div>
+          <Stack gap={2}>
+            <Button variant='primary' onClick={handleEdit}>Edit</Button>
+            <Button variant='danger' onClick={handleDelete}>Delete</Button>
+          </Stack>
+        </div>
+      </div>
     </>
   )
 }

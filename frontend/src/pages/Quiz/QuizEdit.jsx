@@ -5,9 +5,10 @@ import useQuizFetch from '../../hooks/useQuizFetch';
 import QuestionCard from '../../components/QuestionCard';
 import API from '../../utils/API';
 import { useAuth } from '../../utils/Auth';
-import { fileToDataUrl, generateId } from '../../utils/utils';
+import { fileToDataUrl, generateId, formatDuration } from '../../utils/utils';
 import Loading from '../../components/Loading';
 import ContentWrapper from '../../components/ContentWrapper';
+import { BsPlusCircle, BsQuestionCircle, BsStopwatch, BsCalendarWeek } from 'react-icons/bs';
 
 const QuizEdit = () => {
   const { quizid } = useParams();
@@ -92,36 +93,52 @@ const QuizEdit = () => {
     navigate(`/quiz/edit/${quizid}/${newId}`, { state: { quiz: quiz } });
   }
 
+  // Cancel Button handler
+  const handleCancel = (event) => {
+    event.preventDefault();
+    navigate('/dashboard');
+  }
+
+  const getCreatedDate = (date) => new Date(date).toLocaleDateString();
+  const getCreatedTime = (date) => new Date(date).toLocaleTimeString();
+
   if (loading || quizLoading) return <Loading/>;
 
   return (
     <ContentWrapper>
       <Card className='shadow'>
         <Card.Body>
+          <div className='d-flex mb-2 justify-content-between'>
+            <Button variant='primary' onClick={handleNewQuestion} className='mw-50'><BsPlusCircle/> Add new question</Button>
+            <Button variant='danger' onClick={handleCancel} className='mw-50'>Cancel</Button>
+          </div>
           <Form>
+            <Form.Label><h6 className='mb-0'>Quiz Name</h6></Form.Label>
             <InputGroup>
-              <InputGroup.Text>Quiz Name</InputGroup.Text>
-              <FormControl type='text' placeholder={quiz.name} value={updateName} onChange={(e) => setUpdateName(e.target.value)}/>
-              <Button variant='outline-primary' onClick={handleNameUpdate}>Update</Button>
+              <FormControl type='text' size='sm' placeholder={quiz.name} value={updateName} onChange={(e) => setUpdateName(e.target.value)}/>
+              <Button variant='outline-primary' size='sm' onClick={handleNameUpdate}>Update</Button>
             </InputGroup>
-            <p>Owner: {quiz.owner}</p>
-            <p>Created: {new Date(quiz.createdAt).toLocaleString()}</p>
-            <p>Total Duration: {totalDuration} seconds</p>
+            <div className='d-flex mt-2 align-items-center justify-content-between'>
+              <div>
+                <p><BsCalendarWeek/> <span><span>{getCreatedDate(quiz.createdAt)}</span>, <span className='text-nowrap'>{getCreatedTime(quiz.createdAt)}</span></span></p>
+                <p><BsQuestionCircle/> {quiz.questions.length} question{quiz.questions.length === 1 ? '' : 's'}</p>
+                <p><BsStopwatch/> {formatDuration(totalDuration)}</p>
+              </div>
+              <div className='w-50 d-flex'>
+                <Image className='ms-auto' fluid thumbnail src={quiz.thumbnail || ''} alt='No thumbnail' width='100%' height='100%'></Image>
+              </div>
+            </div>
+            <Form.Label><h6 className='mb-0'>Thumbnail</h6></Form.Label>
             <InputGroup>
-              <InputGroup.Text>Thumbnail</InputGroup.Text>
-              <FormControl type='file' isInvalid={thumbnailInvalid} onChange={(e) => setUpdateThumbnail(e.target.files && e.target.files[0])}/>
-              <Button variant='outline-primary' onClick={handleThumbnailUpdate}>Update</Button>
+              <FormControl type='file' size='sm' isInvalid={thumbnailInvalid} onChange={(e) => setUpdateThumbnail(e.target.files && e.target.files[0])}/>
+              <Button variant='outline-primary' size='sm' onClick={handleThumbnailUpdate}>Update</Button>
             </InputGroup>
-            <Image thumbnail src={quiz.thumbnail || ''} alt='No image' width='100px' height='100px'></Image>
-            { quiz && <p>{quiz.questions.length} question{quiz.questions.length === 1 ? '' : 's'}</p> }
           </Form>
         </Card.Body>
       </Card>
       <Card className='shadow'>
         <Card.Body>
-          <div className='d-grid gap-2'>
-            <Button variant='primary' onClick={handleNewQuestion} className='mx-auto mb-2 mw-50'>Add new question</Button>
-          </div>
+          <Card.Title className='text-center'>Question List</Card.Title>
           <ListGroup>
             { quiz &&
               quiz.questions.map((question, index) => (
@@ -129,6 +146,11 @@ const QuizEdit = () => {
                   <QuestionCard question={question} quiz={quiz} updateQuiz={updateQuiz}></QuestionCard>
                 </ListGroup.Item>
               ))
+            }
+            { quiz && !quiz.questions.length &&
+              <ListGroup.Item>
+                <i>No questions to display</i>
+              </ListGroup.Item>
             }
           </ListGroup>
         </Card.Body>

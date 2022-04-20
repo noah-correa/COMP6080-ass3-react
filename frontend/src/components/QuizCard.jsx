@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Image, Modal, Badge, Stack } from 'react-bootstrap';
 import API from '../utils/API';
@@ -10,6 +10,7 @@ import Loading from './Loading';
 import CountdownTimer from './CountdownTimer';
 import { BsQuestionCircle, BsStopwatch, BsCalendarWeek, BsPeople, BsCardList } from 'react-icons/bs';
 import styled from 'styled-components';
+import { formatDuration } from '../utils/utils';
 
 const BadgeLink = styled(Link)`
   text-decoration: none;
@@ -32,6 +33,7 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
   const [showStartPopup, setShowStartPopup] = useState(false);
   const [showStopPopup, setShowStopPopup] = useState(false);
   const [questionInProgress, setQuestionInProgress] = useState(false);
+  const interval = useRef();
 
   // Empty Quiz Card
   if (empty) {
@@ -45,19 +47,18 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
   }
 
   // Set sessionid and timer to check number of players
-  useEffect(async () => {
-    const intervalFetch = async (token, sid) => await fetchAdminStatus(token, sid);
+  useEffect(() => {
+    const intervalFetch = (token, sid) => fetchAdminStatus(token, sid);
 
     if (quiz.active) {
       setSessionId(quiz.active);
     }
-    let interval;
     if (quiz.active && adminStatus.position === -1 && !quizStarted) {
-      interval = setInterval(() => intervalFetch(token, quiz.active), 1000);
+      interval.current = setInterval(() => intervalFetch(token, quiz.active), 1000);
     } else {
-      clearInterval(interval);
+      clearInterval(interval.current);
     }
-    return () => clearInterval(interval);
+    return () => clearInterval(interval.current);
   }, [quiz, quizStarted, adminStatus]);
 
   // Fetch questions from backend
@@ -163,14 +164,8 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
     return window.location.href.replace('dashboard', `quiz/join/${sessionid}`);
   }
 
-  // Format duration to string
-  const formatDuration = (duration) => {
-    const m = Math.floor(duration / 60);
-    const s = duration % 60;
-    if (m && s) return `${m}:${String(s).padStart(2, '0')}`;
-    if (m) return `${m}:00`;
-    if (s) return `0:${String(s).padStart(2, '0')}`
-  }
+  const getCreatedDate = (date) => new Date(date).toLocaleDateString();
+  const getCreatedTime = (date) => new Date(date).toLocaleTimeString();
 
   if (loading || quizLoading) return <Loading/>;
 
@@ -200,12 +195,12 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
             <div className='d-flex justify-content-between'>
               {/* Left Column */}
               <Stack gap={2} className=''>
+                <div><BsCalendarWeek/> <span><span>{getCreatedDate(quiz.createdAt)}</span>, <span className='text-nowrap'>{getCreatedTime(quiz.createdAt)}</span></span></div>
                 <div><BsQuestionCircle/> { questions.length } question{ questions.length === 1 ? '' : 's' }</div>
                 <div><BsStopwatch/> {formatDuration(duration)}</div>
-                <div><BsCalendarWeek/> {new Date(quiz.createdAt).toLocaleString()}</div>
                 { quiz.thumbnail &&
-                  <div>
-                    <Image fluid thumbnail src={quiz.thumbnail} alt='No image' width='180px' height='100%'/>
+                  <div className='w-75'>
+                    <Image fluid thumbnail src={quiz.thumbnail} alt='No image' width='100%' height='100%'/>
                   </div>
                 }
               </Stack>
@@ -223,7 +218,7 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
                   <Stack gap={2}>
                     { !quiz.active && <Button variant='primary' onClick={handleEdit}>Edit</Button> }
                     { !quiz.active && <Button variant='danger' onClick={handleDelete}>Delete</Button> }
-                    { !quiz.active && <Button variant='success' onClick={handleStart}>Start</Button> }
+                    { !quiz.active && <Button variant='success' onClick={handleStart} disabled={!questions.length}>Start</Button> }
                     { quiz.active && <Button variant='warning' onClick={handleAdvance} disabled={questionInProgress || !adminStatus.players.length}>Next</Button> }
                     { quiz.active && <Button variant='danger' onClick={handleStop}>Stop</Button> }
                   </Stack>
@@ -239,7 +234,9 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
           </Modal.Header>
           <Modal.Body>
             <p>Open session in new tab: <Link to={`/quiz/join/${quiz.active}`} target='_blank'>{quiz.active || ''}</Link></p>
-            { quiz.active && <Button variant='primary' onClick={() => navigator.clipboard.writeText(generateSessionUrl(quiz.active))}>Copy Session Link</Button> }
+            <div className='d-flex justify-content-end'>
+              { quiz.active && <Button variant='primary' onClick={() => navigator.clipboard.writeText(generateSessionUrl(quiz.active))}>Copy Session Link</Button> }
+            </div>
           </Modal.Body>
       </Modal>
       <Modal show={showStopPopup} onHide={() => setShowStopPopup(false)}>
@@ -248,8 +245,10 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
           </Modal.Header>
           <Modal.Body>
             <p>Would you like to view the results?</p>
-            <Button variant='primary' onClick={handleViewResults}>Yes</Button>
-            <Button variant='danger' onClick={() => setShowStopPopup(false)}>No</Button>
+            <div className='d-flex justify-content-end'>
+              <Button variant='primary' onClick={handleViewResults}>Yes</Button>
+              <Button variant='danger' onClick={() => setShowStopPopup(false)}>No</Button>
+            </div>
           </Modal.Body>
       </Modal>
     </>
