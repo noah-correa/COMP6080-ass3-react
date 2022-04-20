@@ -47,24 +47,22 @@ const QuizOptions = ({ questionType, options, updateSelected, disabled, correct 
   if (disabled && correct.length === 0) return <Loading variant='dark'/>
 
   return (
-    <>
-      <OptionsContainer fluid>
-        { options && options.map((option, idx) => (
-          <OptionButton
-            key={idx}
-            index={idx}
-            handleClick={(e) => handleChangeSelected(e, idx)}
-            selected={selected && selected.includes(idx)}
-            correct={correct && correct.includes(idx)}
-            questionType={questionType}
-            disabled={disabled}
-            question={option}
-          >
-          </OptionButton>
-        ))
-        }
-      </OptionsContainer>
-    </>
+    <OptionsContainer fluid>
+      { options && options.map((option, idx) => (
+        <OptionButton
+          key={idx}
+          index={idx}
+          handleClick={(e) => handleChangeSelected(e, idx)}
+          selected={selected && selected.includes(idx)}
+          correct={correct && correct.includes(idx)}
+          questionType={questionType}
+          disabled={disabled}
+          question={option}
+        >
+        </OptionButton>
+      ))
+      }
+    </OptionsContainer>
   )
 }
 

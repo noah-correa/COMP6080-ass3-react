@@ -61,20 +61,20 @@ const Login = () => {
           <Form noValidate validated={validated} onSubmit={handleLogin}>
             <Form.Group>
               <Form.Label>Email</Form.Label>
-              <Form.Control required isInvalid={!!errors.email} type='email' placeholder='Enter email' autoComplete='on' ref={emailRef} name="email"></Form.Control>
+              <Form.Control required id='email' isInvalid={!!errors.email} type='email' placeholder='Enter email' autoComplete='on' ref={emailRef} name="email"></Form.Control>
               <Form.Control.Feedback type='invalid'>Invalid email</Form.Control.Feedback>
             </Form.Group>
             <br/>
             <Form.Group>
               <Form.Label>Password</Form.Label>
-              <Form.Control required isInvalid={!!errors.password} type='password' placeholder='Enter password' autoComplete='on' ref={passwordRef} name="password"></Form.Control>
+              <Form.Control required id='password' isInvalid={!!errors.password} type='password' placeholder='Enter password' autoComplete='on' ref={passwordRef} name="password"></Form.Control>
               <Form.Control.Feedback type='invalid'>Invalid password</Form.Control.Feedback>
             </Form.Group>
             <br/>
-            <Button variant='primary' type='submit'>Login</Button>
+            <Button id='login-button' variant='primary' type='submit'>Login</Button>
           </Form>
           <br/>
-          <Link to="/register">Don&apos;t have an account? Register</Link>
+          <Link id='register-link' to="/register">Don&apos;t have an account? Register</Link>
         </Card.Body>
       </AuthCard>
     </ContentWrapper>

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Button, Stack } from 'react-bootstrap';
 import { CorrectIcon, IncorrectIcon } from '../styles/common';
 
-const OptionButtonWrapper = styled(Button)`
+export const OptionButtonWrapper = styled(Button)`
   min-width: 35%;
   max-width: 240px;
   min-height: 3vw;
@@ -12,7 +12,7 @@ const OptionButtonWrapper = styled(Button)`
   text-align: left;
 `;
 
-const ButtonContent = styled(Stack)`
+export const ButtonContent = styled(Stack)`
   display: flex;
   align-items: center;
   height: 100%;

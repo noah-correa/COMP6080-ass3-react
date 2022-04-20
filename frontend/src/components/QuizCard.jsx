@@ -171,7 +171,7 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
 
   return (
     <>
-      <Card className='shadow'>
+      <Card className='shadow' id={quizid} name={quiz.name}>
         <Card.Body>
           {/* Title / Active Row */}
           <div className='d-flex align-items-center justify-content-between mb-1'>
@@ -216,11 +216,11 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
                 {/* Buttons Column */}
                 <div className='d-flex align-items-end justify-content-center'>
                   <Stack gap={2}>
-                    { !quiz.active && <Button variant='primary' onClick={handleEdit}>Edit</Button> }
-                    { !quiz.active && <Button variant='danger' onClick={handleDelete}>Delete</Button> }
-                    { !quiz.active && <Button variant='success' onClick={handleStart} disabled={!questions.length}>Start</Button> }
-                    { quiz.active && <Button variant='warning' onClick={handleAdvance} disabled={questionInProgress || !adminStatus.players.length}>Next</Button> }
-                    { quiz.active && <Button variant='danger' onClick={handleStop}>Stop</Button> }
+                    { !quiz.active && <Button variant='primary' onClick={handleEdit} name='edit'>Edit</Button> }
+                    { !quiz.active && <Button variant='danger' onClick={handleDelete} name='delete'>Delete</Button> }
+                    { !quiz.active && <Button variant='success' onClick={handleStart} name='start'>Start</Button> }
+                    { quiz.active && <Button variant='warning' onClick={handleAdvance} name='advance' disabled={questionInProgress || !adminStatus.players.length}>Next</Button> }
+                    { quiz.active && <Button variant='danger' onClick={handleStop} name='stop'>Stop</Button> }
                   </Stack>
                 </div>
               </div>
@@ -246,8 +246,8 @@ const QuizCard = ({ empty, quizid, fetchAllQuizzes }) => {
           <Modal.Body>
             <p>Would you like to view the results?</p>
             <div className='d-flex justify-content-end'>
-              <Button variant='primary' onClick={handleViewResults}>Yes</Button>
-              <Button variant='danger' onClick={() => setShowStopPopup(false)}>No</Button>
+              <Button variant='primary' onClick={handleViewResults} name='show-results'>Yes</Button>
+              <Button variant='danger' onClick={() => setShowStopPopup(false)} name='close-results'>No</Button>
             </div>
           </Modal.Body>
       </Modal>

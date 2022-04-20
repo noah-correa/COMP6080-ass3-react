@@ -16,7 +16,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --watchAll=true",
+    "test": "react-scripts test --watchAll=false && yarn run cypress run",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.{js,jsx}"
   },
@@ -42,6 +42,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "cypress": "^9.5.4",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
     "eslint": "^7.12.1",

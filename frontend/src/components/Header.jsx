@@ -59,7 +59,7 @@ const Header = ({ auth }) => {
           <HeaderNavButton onClick={handleJoinGame}>Join Game</HeaderNavButton>
         </div>
       </div>
-      { token && <LogoutWrapper><Logout token={token} logout={logout}/></LogoutWrapper>}
+      { token && <LogoutWrapper><Logout token={token} logout={logout} onLogout={() => navigate('/login')}/></LogoutWrapper>}
     </HeaderWrapper>
   )
 }

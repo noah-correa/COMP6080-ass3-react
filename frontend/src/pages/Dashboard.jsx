@@ -57,6 +57,7 @@ const Dashboard = () => {
             <Button
               variant='primary'
               type='button'
+              id='show-new-quiz'
               onClick={() => setShowCreateQuiz(!showCreateQuiz)}
             >
               Create a new quiz
@@ -64,8 +65,8 @@ const Dashboard = () => {
               <Collapse in={showCreateQuiz}>
                 <div>
                   <InputGroup className='mb-2'>
-                    <FormControl isValid={success} placeholder='Enter quiz name' ref={createQuizNameRef}></FormControl>
-                    <Button variant='outline-primary' onClick={handleCreateQuiz}>Create</Button>
+                    <FormControl id='new-quiz-name' isValid={success} placeholder='Enter quiz name' ref={createQuizNameRef}></FormControl>
+                    <Button id='new-quiz-button' variant='outline-primary' onClick={handleCreateQuiz}>Create</Button>
                   </InputGroup>
                 </div>
               </Collapse>

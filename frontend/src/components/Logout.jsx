@@ -1,11 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import styled from 'styled-components';
 import { MdOutlineLogout } from 'react-icons/md';
 
-const LogoutButtonWrapper = styled(Button)`
+export const LogoutButtonWrapper = styled(Button)`
   color: white;
   background-color: #25076b;
   border: none;
@@ -14,21 +13,19 @@ const LogoutButtonWrapper = styled(Button)`
   };
 `;
 
-const Logout = ({ token, logout }) => {
-  const navigate = useNavigate();
-
+const Logout = ({ token, logout, onLogout }) => {
   const handleLogout = async (event) => {
     event.preventDefault();
     const data = await logout(token);
-    if (data.error) {
-      console.error('Invalid token');
+    if (!data.error) {
+      onLogout();
     } else {
-      navigate('/login');
+      console.error('Invalid token');
     }
   }
 
   return (
-    <LogoutButtonWrapper variant='secondary' onClick={handleLogout}>
+    <LogoutButtonWrapper id='button-logout' variant='secondary' onClick={handleLogout}>
       <MdOutlineLogout/> Logout
     </LogoutButtonWrapper>
   )
@@ -37,6 +34,7 @@ const Logout = ({ token, logout }) => {
 Logout.propTypes = {
   token: PropTypes.string.isRequired,
   logout: PropTypes.func.isRequired,
+  onLogout: PropTypes.func.isRequired,
 }
 
 export default Logout;
