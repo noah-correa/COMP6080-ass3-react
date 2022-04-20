@@ -1,0 +1,13 @@
+# UI/UX Approach
+- Functionality was first prioritised
+- Then styling was considered
+- React Bootstrap Component library was used
+- React Icons was used for icons
+- Recharts was used for charts
+- Styled Components was used to style components
+- Header and footer are present
+  - Header contains dynamic links based on authentication
+  - Header also routes to dashboard on logo click
+- All content is displayed in center of screen for visual appeal between device viewports
+- Loading Icon displayed while loading content from backend
+- Some transitions on creating new game button and charts
